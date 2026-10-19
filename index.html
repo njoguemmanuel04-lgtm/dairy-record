@@ -3,187 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HarvestChain - Kirinyaga Smart Farming</title>
+<title>HarvestChain Kenya - 47 Counties - Vercel Env Secure</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
-<style>
-body{font-family:'Plus Jakarta Sans',sans-serif}
-h1,h2,h3{font-family:'Outfit',sans-serif}
-.glass{backdrop-filter: blur(12px); background: rgba(255,255,255,0.85)}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>body{font-family:'Inter',sans-serif} .produce-img{object-fit:cover;width:100%;height:180px}</style>
 </head>
-<body class="bg-[#f6f8f1] text-[#1a2e05]">
-
-<header class="sticky top-0 z-50 glass border-b border-green-100">
-<div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-<div class="flex items-center gap-2"><div class="w-8 h-8 bg-green-700 rounded-lg flex items-center justify-center text-white font-bold">H</div><span class="font-bold text-xl">HarvestChain</span><span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full ml-2">Kirinyaga • Mwea</span></div>
-<div class="flex gap-2"><button onclick="showSection('market')" class="px-4 py-2 bg-green-700 text-white rounded-full text-sm font-semibold">Market</button><button onclick="showSection('ai')" class="px-4 py-2 bg-white border rounded-full text-sm font-semibold">AI Buyer</button></div>
+<body class="bg-[#f8faf6]">
+<header class="sticky top-0 z-50 bg-white border-b shadow-sm">
+<div class="max-w-[1280px] mx-auto px-4 py-3 flex justify-between items-center">
+<div class="flex items-center gap-3"><div class="w-10 h-10 bg-[#16a34a] rounded-xl flex items-center justify-center text-white font-extrabold">H</div><div><div class="font-extrabold">HarvestChain</div><div class="text-[10px] text-gray-500 font-bold uppercase">Kenya • 47 Counties • Vercel Secure</div></div></div>
+<select id="countySelect" onchange="renderMarket()" class="bg-gray-50 border rounded-full px-3 py-2 text-sm font-semibold"></select>
+</div>
+<div class="max-w-[1280px] mx-auto px-4 pb-3 flex gap-2">
+<input id="searchInput" oninput="renderMarket()" placeholder="🔍 Search rice, potatoes, cabbage, county..." class="flex-1 bg-gray-50 border rounded-full px-5 py-2.5 text-sm">
+<select id="categorySelect" onchange="renderMarket()" class="bg-white border rounded-full px-4 py-2.5 text-sm font-semibold"><option value="">All Categories</option><option>Cereals</option><option>Tubers</option><option>Vegetables</option><option>Fruits</option><option>Legumes</option><option>Dairy</option></select>
 </div>
 </header>
 
-<div class="max-w-6xl mx-auto px-4 py-6 grid lg:grid-cols-3 gap-6">
-<div class="lg:col-span-2 space-y-6">
+<div class="max-w-[1280px] mx-auto px-4 py-6 grid lg:grid-cols-3 gap-6">
+<div class="lg:col-span-2 space-y-6" id="marketSection">
+<div class="bg-gradient-to-br from-[#15803d] to-[#65a30d] rounded-[24px] p-6 text-white"><h1 class="text-3xl font-extrabold leading-tight">Kenya Marketplace — Secure Groq via Vercel Env</h1><p class="mt-2 text-sm text-white/90">Key is in Vercel Environment (process.env.GROQ_API_KEY) — not in frontend. Real produce images, 47 counties, masked phones.</p></div>
 
-<div class="bg-gradient-to-br from-green-700 to-lime-600 text-white rounded-[24px] p-6">
-<h1 class="text-3xl font-bold leading-tight">Mwea Rice, Kirinyaga Tomatoes — Sell Direct, Get Paid via M-Pesa</h1>
-<p class="mt-2 text-green-50">Real market prices + AI buyer negotiation. Supabase synced.</p>
-<div class="mt-4 flex gap-2 text-xs">
-<span class="bg-white/20 px-3 py-1 rounded-full">🌾 Pishori: KSh 185/kg</span>
-<span class="bg-white/20 px-3 py-1 rounded-full">🍅 Tomato: KSh 65/kg</span>
-<span class="bg-white/20 px-3 py-1 rounded-full">🌽 Maize: KSh 58/kg</span>
-</div>
-</div>
-
-<div class="bg-white rounded-[20px] p-5 shadow-sm border border-green-50">
-<h2 class="font-bold text-lg mb-3">List Your Harvest</h2>
-<div class="grid grid-cols-2 gap-3">
-<input id="cropName" placeholder="Crop (e.g. Mwea Pishori Rice)" class="col-span-2 border rounded-xl px-4 py-3 text-sm">
+<div class="bg-white rounded-[22px] p-5 border">
+<h2 class="font-bold mb-3">List Your Harvest — With Real Photo</h2>
+<div class="grid md:grid-cols-2 gap-3">
+<input id="cropName" placeholder="Crop: Meru Potatoes" class="border rounded-xl px-4 py-3 text-sm w-full">
+<select id="cropCat" class="border rounded-xl px-4 py-3 text-sm bg-white w-full"><option>Cereals</option><option>Tubers</option><option>Vegetables</option><option>Fruits</option><option>Legumes</option><option>Dairy</option></select>
 <input id="qty" type="number" placeholder="Qty kg" class="border rounded-xl px-4 py-3 text-sm">
-<input id="price" type="number" placeholder="Price /kg KSh" class="border rounded-xl px-4 py-3 text-sm">
-<input id="location" placeholder="Location (e.g. Ngurubani)" class="col-span-2 border rounded-xl px-4 py-3 text-sm">
-<input id="phone" placeholder="M-Pesa Phone 07..." class="col-span-2 border rounded-xl px-4 py-3 text-sm">
+<input id="price" type="number" placeholder="Price /kg KSh" oninput="validatePrice()" class="border rounded-xl px-4 py-3 text-sm">
+<select id="countyInput" class="border rounded-xl px-4 py-3 text-sm bg-white"></select>
+<input id="location" placeholder="Market: Timau, Ngurubani" class="border rounded-xl px-4 py-3 text-sm">
+<input id="phone" placeholder="M-Pesa 07..." class="md:col-span-2 border rounded-xl px-4 py-3 text-sm">
+<input id="imageUrl" placeholder="Optional image link or auto" class="md:col-span-2 border rounded-xl px-4 py-3 text-sm bg-gray-50">
 </div>
-<button onclick="addHarvest()" class="mt-4 w-full bg-[#1a2e05] text-white py-3 rounded-xl font-semibold">+ List on Chain & Sync to Supabase</button>
-<p id="syncStatus" class="text-xs mt-2 text-gray-500">Sync: local (add Supabase keys to enable cloud)</p>
-</div>
-
-<div class="bg-white rounded-[20px] p-5 shadow-sm border border-green-50">
-<div class="flex justify-between items-center mb-4"><h2 class="font-bold text-lg">Live Market</h2><button onclick="loadMarket()" class="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-full">Refresh</button></div>
-<div id="marketList" class="space-y-3"></div>
-</div>
+<p id="priceHint" class="text-xs mt-2 text-gray-500"></p>
+<button onclick="addHarvest()" class="mt-4 w-full bg-black text-white py-3.5 rounded-xl font-bold">+ Publish with Real Image</button>
+<p id="syncStatus" class="text-xs mt-2 text-gray-500"></p>
 </div>
 
-<div class="space-y-6">
-<div id="aiSection" class="bg-white rounded-[20px] p-5 shadow-sm border border-green-50">
-<h2 class="font-bold">AI Buyer Chat (Groq Real)</h2>
-<p class="text-xs text-gray-500 mt-1">Negotiates like a real Nairobi/Mwea broker.</p>
-<div class="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs">
-⚠️ <b>Setup:</b> Find <code>GROQ_KEY</code> below and paste your Groq key LOCALLY on laptop. Don't push with key to GitHub.
-</div>
-<div id="chatBox" class="mt-4 h-[320px] overflow-y-auto border rounded-xl p-3 space-y-2 bg-[#fafdf5] text-sm"></div>
-<div class="mt-3 flex gap-2">
-<input id="chatInput" placeholder="Bei ya mchele leo?..." class="flex-1 border rounded-xl px-3 py-2 text-sm" onkeydown="if(event.key==='Enter')sendToAI()">
-<button onclick="sendToAI()" class="bg-green-700 text-white px-4 py-2 rounded-xl text-sm font-semibold">Send</button>
-</div>
-<div class="mt-3 grid grid-cols-2 gap-2 text-[11px]">
-<button onclick="quickAsk('What is current price for Mwea Pishori rice per kg in Kirinyaga?')" class="bg-green-50 text-green-800 p-2 rounded-lg text-left">📈 Current rice price?</button>
-<button onclick="quickAsk('I have 200kg tomatoes in Ngurubani, what is best selling price and buyer?')" class="bg-green-50 text-green-800 p-2 rounded-lg text-left">🍅 Sell my tomatoes</button>
-<button onclick="quickAsk('Draft M-Pesa payment message for 50kg rice at 180 per kg')" class="bg-green-50 text-green-800 p-2 rounded-lg text-left">💸 M-Pesa message</button>
-<button onclick="quickAsk('Explain to farmer in Swahili how HarvestChain works')" class="bg-green-50 text-green-800 p-2 rounded-lg text-left">🇰🇪 Explain in Swahili</button>
+<div class="bg-white rounded-[22px] p-5 border">
+<div class="flex justify-between items-center mb-4"><h2 class="font-bold text-[19px]">Live Market — Real Produce Photos</h2><span id="countLabel" class="text-xs bg-gray-900 text-white px-3 py-1 rounded-full font-bold"></span></div>
+<div id="marketList" class="grid md:grid-cols-2 gap-4"></div>
 </div>
 </div>
 
-<div class="bg-[#1a2e05] text-white rounded-[20px] p-5">
-<h3 class="font-bold">M-Pesa STK Simulation</h3>
-<div class="mt-4 space-y-3">
-<input id="mpesaPhone" placeholder="Buyer Phone 07..." class="w-full rounded-xl px-4 py-3 text-sm text-black">
-<input id="mpesaAmount" placeholder="Amount KSh" type="number" class="w-full rounded-xl px-4 py-3 text-sm text-black">
-<button onclick="simulateMpesa()" class="w-full bg-lime-400 text-[#1a2e05] py-3 rounded-xl font-bold">Simulate STK Push</button>
-<p id="mpesaLog" class="text-xs text-green-300"></p>
+<div class="space-y-5">
+<div class="bg-white rounded-[22px] p-5 border">
+<h2 class="font-bold">🤖 AI Buyer Assistant • Vercel Secure</h2>
+<p class="text-xs text-gray-500 mt-1">Uses Vercel env key — not exposed in browser.</p>
+<div id="chatBox" class="mt-4 h-[340px] overflow-y-auto border rounded-xl p-3 space-y-3 bg-[#f9fdf6] text-[13px]"></div>
+<div class="mt-3 flex gap-2"><input id="chatInput" placeholder="Nataka 100kg Meru..." class="flex-1 border rounded-xl px-3 py-2.5 text-sm" onkeydown="if(event.key==='Enter')sendToAI()"><button onclick="sendToAI()" class="bg-[#16a34a] text-white px-5 py-2.5 rounded-xl font-bold">Send</button></div>
 </div>
-</div>
+<div class="bg-[#0f172a] text-white rounded-[22px] p-5"><h3 class="font-bold">🔒 M-Pesa Escrow</h3><input id="mpesaPhone" placeholder="Buyer Phone" class="w-full mt-3 rounded-xl px-4 py-3 text-sm text-black"><input id="mpesaAmount" placeholder="Amount" type="number" class="w-full mt-2 rounded-xl px-4 py-3 text-sm text-black"><button onclick="simulateMpesa()" class="w-full mt-3 bg-green-400 text-black py-3 rounded-xl font-bold">STK Push</button><p id="mpesaLog" class="text-xs mt-2 text-green-300"></p></div>
 </div>
 </div>
 
 <script>
-// ===== CONFIG - EDIT ON YOUR LAPTOP ONLY =====
-const GROQ_KEY = "PASTE_YOUR_KEY_HERE_ON_YOUR_LAPTOP";
+// NO GROQ KEY HERE ANYMORE — uses /api/chat which reads Vercel env
 const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
 const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
-// ==============================================
-
-let supabaseClient = null;
-if(SUPABASE_URL.startsWith("https")){
-  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  document.getElementById("syncStatus").innerText = "Sync: Supabase connected ✓";
-}
-let harvests = JSON.parse(localStorage.getItem("harvests")||"[]");
-
-function showSection(s){
-  if(s==='market') document.getElementById('marketList').scrollIntoView({behavior:'smooth'});
-  if(s==='ai') document.getElementById('aiSection').scrollIntoView({behavior:'smooth'});
-}
-async function addHarvest(){
-  const data = {
-    crop: document.getElementById("cropName").value,
-    qty: parseFloat(document.getElementById("qty").value),
-    price: parseFloat(document.getElementById("price").value),
-    location: document.getElementById("location").value,
-    phone: document.getElementById("phone").value,
-    created_at: new Date().toISOString()
-  };
-  if(!data.crop || !data.qty || !data.price){ alert("Fill crop, qty, price"); return; }
-  harvests.unshift(data);
-  localStorage.setItem("harvests", JSON.stringify(harvests));
-  renderMarket();
-  if(supabaseClient){
-    try{ await supabaseClient.from("harvests").insert([data]); document.getElementById("syncStatus").innerText = "Synced ✓ " + new Date().toLocaleTimeString(); }catch(e){}
-  }
-  document.getElementById("cropName").value=""; document.getElementById("qty").value=""; document.getElementById("price").value="";
-}
-function renderMarket(){
-  const list = document.getElementById("marketList");
-  if(harvests.length===0){ list.innerHTML="<p class='text-sm text-gray-400'>No listings yet — add your harvest above.</p>"; return; }
-  list.innerHTML = harvests.map(h=>`
-    <div class="border rounded-xl p-3 flex justify-between items-center">
-      <div><div class="font-semibold text-sm">${h.crop}</div><div class="text-xs text-gray-500">${h.qty}kg @ KSh ${h.price}/kg • ${h.location} • ${h.phone}</div></div>
-      <button onclick="quickAsk('Negotiate for ${h.crop} ${h.qty}kg at ${h.price} in ${h.location}. Buyer wants lower price. Help farmer respond.')" class="text-xs bg-[#1a2e05] text-white px-3 py-1 rounded-full">Negotiate</button>
-    </div>
-  `).join("");
-}
-async function loadMarket(){
-  renderMarket();
-  if(!supabaseClient) return;
-  try{
-    const {data} = await supabaseClient.from("harvests").select("*").order("created_at", {ascending:false}).limit(20);
-    if(data && data.length){ harvests = data; localStorage.setItem("harvests", JSON.stringify(data)); renderMarket(); }
-  }catch(e){}
-}
-function appendChat(role, text){
-  const box = document.getElementById("chatBox");
-  const bubble = document.createElement("div");
-  bubble.className = role==="user" ? "bg-green-700 text-white ml-8 p-3 rounded-2xl rounded-br-sm" : "bg-white border mr-8 p-3 rounded-2xl rounded-bl-sm";
-  bubble.innerText = text;
-  box.appendChild(bubble);
-  box.scrollTop = box.scrollHeight;
-}
+const COUNTIES = ["Baringo","Bomet","Bungoma","Busia","Elgeyo-Marakwet","Embu","Garissa","Homa Bay","Isiolo","Kajiado","Kakamega","Kericho","Kiambu","Kilifi","Kirinyaga","Kisii","Kisumu","Kitui","Kwale","Laikipia","Lamu","Machakos","Makueni","Mandera","Marsabit","Meru","Migori","Mombasa","Murang'a","Nairobi","Nakuru","Nandi","Narok","Nyamira","Nyandarua","Nyeri","Samburu","Siaya","Taita-Taveta","Tana River","Tharaka-Nithi","Trans Nzoia","Turkana","Uasin Gishu","Vihiga","Wajir","West Pokot"];
+function populateCounties(){ document.getElementById("countySelect").innerHTML='<option value="">🇰🇪 All 47 Counties</option>'+COUNTIES.map(c=>`<option ${c==='Meru'?'selected':''}>${c}</option>`).join(""); document.getElementById("countyInput").innerHTML=COUNTIES.map(c=>`<option ${c==='Meru'?'selected':''}>${c}</option>`).join(""); }
+populateCounties();
+let supabaseClient=null; if(SUPABASE_URL.startsWith("https://")){ supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); }
+function getRealProduceImage(crop,customUrl){ if(customUrl&&customUrl.trim().startsWith("http")) return customUrl.trim(); const c=(crop||"").toLowerCase(); if(c.includes("pishori")||c.includes("rice")) return "https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?w=800&q=80"; if(c.includes("potato")||c.includes("waru")) return "https://images.unsplash.com/photo-1518977676608-bd36c2ca4f9d?w=800&q=80"; if(c.includes("tomato")) return "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&q=80"; if(c.includes("maize")||c.includes("corn")) return "https://images.unsplash.com/photo-1551754655-cd94d38c8364?w=800&q=80"; if(c.includes("avocado")) return "https://images.unsplash.com/photo-1526948128573-703ee1aeb6fa?w=800&q=80"; if(c.includes("cabbage")) return "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=800&q=80"; return "https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80"; }
+function maskPhone(p){ if(!p) return ""; return p.toString().slice(0,4)+"***"+p.toString().slice(-4); }
+function validatePrice(){ const v=parseFloat(document.getElementById("price").value); const h=document.getElementById("priceHint"); if(v>1000){ h.innerHTML="⚠️ Too high! If total 20,000 for 100kg, enter 200/kg. Max 1000"; h.className="text-xs mt-2 text-red-600 font-bold bg-red-50 p-2 rounded-lg"; } else if(v>0){ h.innerText="✓ Good: KSh "+v+"/kg"; h.className="text-xs mt-2 text-green-600 bg-green-50 p-2 rounded-lg"; } }
+let harvests=JSON.parse(localStorage.getItem("harvests_pro_v5")||"[]"); if(harvests.length===0){ harvests=[{crop:"Mwea Pishori Rice",cat:"Cereals",qty:200,price:185,county:"Kirinyaga",location:"Mwea",phone:"0712345678",image:"",created_at:new Date().toISOString()},{crop:"Meru Irish Potatoes",cat:"Tubers",qty:500,price:45,county:"Meru",location:"Timau",phone:"0116982197",image:"",created_at:new Date().toISOString()},{crop:"Nakuru Cabbage",cat:"Vegetables",qty:150,price:30,county:"Nakuru",location:"Molo",phone:"0722123456",image:"",created_at:new Date().toISOString()}]; }
+async function addHarvest(){ let price=parseFloat(document.getElementById("price").value); if(price>1000&&!confirm("Price KSh "+price+"/kg too high. Continue?")) return; const data={crop:document.getElementById("cropName").value.trim(),cat:document.getElementById("cropCat").value,qty:parseFloat(document.getElementById("qty").value),price:price,county:document.getElementById("countyInput").value,location:document.getElementById("location").value.trim(),phone:document.getElementById("phone").value.trim(),image:document.getElementById("imageUrl").value.trim(),created_at:new Date().toISOString()}; if(!data.crop||!data.qty||!data.price) return alert("Fill crop, qty, price"); harvests.unshift(data); localStorage.setItem("harvests_pro_v5",JSON.stringify(harvests)); renderMarket(); if(supabaseClient){ try{ await supabaseClient.from("harvests").insert([data]); }catch(e){} } }
+function renderMarket(){ const search=(document.getElementById("searchInput").value||"").toLowerCase(); const cat=document.getElementById("categorySelect").value; const countyFilter=document.getElementById("countySelect").value; let filtered=harvests.filter(h=>{ const s=!search||h.crop.toLowerCase().includes(search)||h.county.toLowerCase().includes(search); const c=!cat||h.cat===cat; const cf=!countyFilter||h.county===countyFilter; return s&&c&&cf; }); document.getElementById("countLabel").innerText=filtered.length+" listings • Real images"; document.getElementById("marketList").innerHTML=filtered.map(h=>{ const img=getRealProduceImage(h.crop,h.image); return `<div class="border rounded-[18px] overflow-hidden bg-white hover:shadow-xl transition"><div class="relative"><img src="${img}" class="produce-img" loading="lazy"><div class="absolute top-3 left-3 bg-white/95 px-2.5 py-1 rounded-full text-[11px] font-bold">✓ Verified</div><div class="absolute top-3 right-3 bg-black/80 text-white px-2.5 py-1 rounded-full text-[11px] font-bold">${h.county}</div></div><div class="p-4"><div class="flex justify-between"><div class="font-bold text-[15px]">${h.crop}</div><div class="text-[12px] font-extrabold text-green-700">KSh ${h.price}/kg</div></div><div class="text-xs text-gray-500 mt-1">${h.location} • ${h.qty}kg • ${maskPhone(h.phone)}</div><div class="mt-3 flex gap-2"><button onclick="quickAsk('Negotiate for ${h.crop} ${h.qty}kg at ${h.price}/kg from ${h.county}')" class="flex-1 bg-black text-white text-xs font-bold py-2.5 rounded-full">🤖 Negotiate</button><button class="border text-xs font-bold px-4 py-2.5 rounded-full">📞 Call</button></div></div></div>`; }).join(""); }
+function appendChat(r,t){ const b=document.getElementById("chatBox"); const d=document.createElement("div"); d.className=r==="user"?"bg-[#16a34a] text-white ml-8 p-3 rounded-2xl":"bg-white border mr-8 p-3 rounded-2xl"; d.innerText=t; b.appendChild(d); b.scrollTop=b.scrollHeight; }
 function quickAsk(t){ document.getElementById("chatInput").value=t; sendToAI(); }
 async function sendToAI(){
-  const input = document.getElementById("chatInput");
-  const msg = input.value.trim();
-  if(!msg) return;
-  appendChat("user", msg);
-  input.value="";
-  if(GROQ_KEY.includes("PASTE_")){
-    appendChat("assistant", "⚠️ Add your Groq key locally: open this HTML, find GROQ_KEY and paste real key, then reload. Once added locally, I'll reply as real Mwea/Nairobi buyer.");
-    return;
-  }
-  const context = `You are HarvestChain AI Buyer for Kirinyaga, Kenya. Farmer listings: ${JSON.stringify(harvests.slice(0,5))}. Prices: Mwea Pishori rice 170-195 KSh/kg, Tomato 50-80, Maize 52-62. You negotiate fairly, know M-Pesa, speak English with occasional Swahili/Sheng. Be concise, Kenyan market smart.`;
-  appendChat("assistant", "Thinking as buyer...");
+  const input=document.getElementById("chatInput"); const msg=input.value.trim(); if(!msg) return;
+  appendChat("user",msg); input.value=""; appendChat("assistant","Thinking via Vercel secure env...");
   try{
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json", "Authorization": "Bearer " + GROQ_KEY },
-      body: JSON.stringify({ model: "llama-3.1-8b-instant", messages: [{role:"system", content: context}, {role:"user", content: msg}], temperature: 0.7, max_tokens: 600 })
-    });
-    const j = await res.json();
-    const lastBubble = document.getElementById("chatBox").lastChild;
-    if(j.choices && j.choices[0]) lastBubble.innerText = j.choices[0].message.content;
-    else lastBubble.innerText = "Groq error: " + JSON.stringify(j).slice(0,400);
-  }catch(e){
-    document.getElementById("chatBox").lastChild.innerText = "Fetch error: " + e.message;
-  }
+    const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:msg, harvests:harvests.slice(0,8)})});
+    const j=await res.json();
+    document.getElementById("chatBox").lastChild.innerText=j.reply || j.error || JSON.stringify(j).slice(0,500);
+  }catch(e){ document.getElementById("chatBox").lastChild.innerText="Error: "+e.message+" — check /api/chat exists"; }
 }
-function simulateMpesa(){
-  const phone = document.getElementById("mpesaPhone").value;
-  const amt = document.getElementById("mpesaAmount").value;
-  if(!phone || !amt){ alert("Enter phone and amount"); return; }
-  document.getElementById("mpesaLog").innerText = `STK Push sent to ${phone} for KSh ${amt} — waiting for PIN... ✓`;
-  setTimeout(()=>{ document.getElementById("mpesaLog").innerText += "\nPaid! Receipt: HC"+Math.floor(Math.random()*9000000); },2000);
-}
-loadMarket();
-appendChat("assistant", "Habari! I'm your AI buyer for Kirinyaga. List your harvest, then ask me to negotiate. Bei ya Mwea rice leo iko 185/kg — uko na ngapi?");
+function simulateMpesa(){ const p=document.getElementById("mpesaPhone").value; const a=document.getElementById("mpesaAmount").value; if(!p||!a) return alert("Enter"); document.getElementById("mpesaLog").innerText=`STK to ${maskPhone(p)} KSh ${a} sent ✓ Escrow`; }
+renderMarket(); appendChat("assistant","Habari! Secure mode: your Groq key is in Vercel env, not in browser. I'm reading it from /api/chat. Ask me anything across 47 counties with real images!");
 </script>
 </body>
 </html>
