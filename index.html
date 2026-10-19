@@ -7,66 +7,46 @@
   <title>HarvestChain AI | Kenya's Smart Agriculture Marketplace</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root{--green:#176b43;--deep:#10452e;--lime:#dff2c2;--bg:#f6f8f4;--white:#fff;--text:#183529;--muted:#718176;--border:#e4eae3;--gold:#f4bd56}
-    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text)}
-    button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.container{width:min(1160px,92%);margin:auto}
+    :root{--green:#176b43;--deep:#10452e;--bg:#f6f8f4;--text:#183529;--muted:#718176;--border:#e4eae3}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select,textarea{font:inherit}button{cursor:pointer}.container{width:min(1160px,92%);margin:auto}
     header{background:white;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
-    .nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .nav{min-height:76px;display:flex;align-items:center;justify-content:space-between}
     .brand{display:flex;align-items:center;gap:10px}.brand-icon{width:43px;height:43px;display:grid;place-items:center;background:var(--green);color:white;border-radius:14px;font-size:25px}
-    .brand strong{display:block;font-size:18px;letter-spacing:-.5px}.brand small{color:var(--muted);font-size:10px;letter-spacing:1px}
-    .nav-links{display:flex;gap:24px;align-items:center;font-size:14px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;padding:12px 18px;border-radius:12px;font-weight:700;font-size:14px;transition:.2s}
-    .btn-primary{background:var(--green);color:white}.btn-outline{border:1px solid var(--border);background:white;color:var(--text)}
-    .hero{padding:48px 0 32px}.hero-panel{background:linear-gradient(120deg,#10452e,#20764b);color:white;border-radius:28px;padding:clamp(25px,5vw,62px);display:grid;grid-template-columns:1.2fr .8fr;gap:25px;align-items:center}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;padding:12px 18px;border-radius:12px;font-weight:700;font-size:14px;transition:.2s}
+    .btn-primary{background:var(--green);color:white}.btn-outline{border:1px solid var(--border);background:white}
+    .hero{padding:48px 0 32px}.hero-panel{background:linear-gradient(120deg,#10452e,#20764b);color:white;border-radius:28px;padding:clamp(25px,5vw,62px);display:grid;grid-template-columns:1.2fr .8fr;gap:25px}
     .eyebrow{display:inline-block;background:#ffffff20;border:1px solid #ffffff35;padding:8px 12px;border-radius:30px;font-size:12px;font-weight:700}
-    h1{font-size:clamp(36px,5vw,60px);line-height:1.05;letter-spacing:-2px;margin:20px 0}.hero p{color:#e0eee3;line-height:1.8;max-width:550px}.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
+    h1{font-size:clamp(36px,5vw,60px);line-height:1.05;letter-spacing:-2px;margin:20px 0}.hero p{color:#e0eee3;line-height:1.8}
     .section{padding:30px 0}.searchbar{display:flex;align-items:center;gap:10px;background:white;padding:10px;border:1px solid var(--border);border-radius:15px;margin:25px 0 18px}
-    .searchbar input{flex:1;min-width:0;border:0;outline:0;padding:10px 5px;background:transparent}
+    .searchbar input{flex:1;border:0;outline:0;padding:10px 5px;background:transparent}
     .filters{display:flex;gap:8px;overflow-x:auto;padding:3px 0 12px}.filter{flex-shrink:0;border:1px solid var(--border);border-radius:30px;padding:9px 14px;background:white;color:var(--muted);font-size:13px}.filter.active{background:var(--green);color:white;border-color:var(--green)}
-    .crop-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.crop-card{background:white;border:1px solid var(--border);border-radius:19px;padding:17px;transition:transform .2s,box-shadow .2s}
-    .crop-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px #173d2910}.crop-emoji{height:110px;display:grid;place-items:center;background:#eff5e9;border-radius:13px;font-size:55px;margin-bottom:15px}
+    .crop-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.crop-card{background:white;border:1px solid var(--border);border-radius:19px;padding:17px}
+    .crop-emoji{height:110px;display:grid;place-items:center;background:#eff5e9;border-radius:13px;font-size:55px;margin-bottom:15px}
     .ai-panel{background:#eaf3e5;border:1px solid #d9e8d1;border-radius:23px;padding:clamp(22px,4vw,35px);display:grid;grid-template-columns:1fr 1fr;gap:25px}
-    .ai-box{background:white;border-radius:17px;padding:18px}.ai-box select,.ai-box input{width:100%;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px}
-    .ai-answer{display:none;margin-top:15px;padding:16px;background:#f6fbf3;border-left:4px solid var(--green);border-radius:10px;white-space:pre-wrap;line-height:1.6}
-    footer{margin-top:45px;padding:30px 0 95px;border-top:1px solid var(--border)}
-    .notice{display:none;position:fixed;z-index:60;bottom:85px;left:5%;width:90%;max-width:420px;background:#183529;color:white;border-radius:14px;padding:15px 17px}
-    .notice.show{display:block}.modal-backdrop{display:none;position:fixed;inset:0;z-index:50;background:#10251dcc;align-items:center;justify-content:center;padding:20px}
-    .modal-backdrop.show{display:flex}.modal{width:100%;max-width:450px;max-height:85vh;overflow:auto;background:white;border-radius:20px;padding:24px}
+    .ai-box{background:white;border-radius:17px;padding:18px}.ai-answer{display:none;margin-top:15px;padding:16px;background:#f6fbf3;border-left:4px solid var(--green);border-radius:10px;white-space:pre-wrap;line-height:1.6}
+    footer{margin-top:45px;padding:30px 0;border-top:1px solid var(--border)}
+    .notice{display:none;position:fixed;z-index:60;bottom:85px;left:5%;width:90%;max-width:420px;background:#183529;color:white;border-radius:14px;padding:15px 17px}.notice.show{display:block}
+    .modal-backdrop{display:none;position:fixed;inset:0;z-index:50;background:#10251dcc;align-items:center;justify-content:center;padding:20px}.modal-backdrop.show{display:flex}.modal{width:100%;max-width:450px;max-height:85vh;overflow:auto;background:white;border-radius:20px;padding:24px}
     .modal input,.modal select,.modal textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px}
     .modal-actions{display:flex;gap:10px;margin-top:18px}.modal-actions button{flex:1}
-    @media(max-width:850px){.nav-links{display:none}.hero-panel{grid-template-columns:1fr}.crop-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ai-panel{grid-template-columns:1fr}}
+    @media(max-width:850px){.hero-panel{grid-template-columns:1fr}.crop-grid{grid-template-columns:repeat(2,1fr)}.ai-panel{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-<header><div class="container nav"><a href="#" class="brand"><div class="brand-icon">🌱</div><div><strong>HarvestChain AI</strong><small>KENYA AGRICULTURAL MARKETPLACE</small></div></a><nav class="nav-links"><a href="#marketplace">Marketplace</a><a href="#ai-assistant">AI assistant</a></nav><button class="btn btn-primary" onclick="openModal('join')">Get started</button></div></header>
+<header><div class="container nav"><a href="#" class="brand"><div class="brand-icon">🌱</div><div><strong>HarvestChain AI</strong><small>KENYA AGRICULTURAL MARKETPLACE</small></div></a><nav style="display:flex;gap:24px;font-size:14px"><a href="#marketplace">Marketplace</a><a href="#ai-assistant">AI assistant</a></nav><button class="btn btn-primary" onclick="openModal('join')">Get started</button></div></header>
 <main>
-<section class="hero container"><div class="hero-panel"><div><span class="eyebrow">🌍 BUILT FOR KENYA'S AGRICULTURE</span><h1>Your farm.<br>Your market.<br>Your opportunity.</h1><p>Connect with buyers, discover new markets, and make smarter decisions with HarvestChain AI.</p><div class="hero-actions"><a class="btn" style="background:white;color:#176b43" href="#marketplace">Explore crops ↗</a><button class="btn" style="background:#ffffff20;color:white;border:1px solid #ffffff50" onclick="openModal('join')">Join HarvestChain</button></div></div><div style="text-align:center;font-size:150px">🌾<br><small style="font-size:14px;letter-spacing:2px">GROW · CONNECT · SELL</small></div></div></section>
-
+<section class="hero container"><div class="hero-panel"><div><span class="eyebrow">🌍 BUILT FOR KENYA'S AGRICULTURE</span><h1>Your farm.<br>Your market.<br>Your opportunity.</h1><p>Connect with buyers, discover new markets, and make smarter decisions with HarvestChain AI.</p></div><div style="text-align:center;font-size:120px">🌾</div></div></section>
 <section class="section container" id="marketplace"><div class="searchbar"><span>🔎</span><input id="searchInput" type="search" placeholder="Search maize, rice, avocados..."><button class="btn btn-primary" onclick="renderCrops()">Search</button></div><div class="filters" id="filters"><button class="filter active" data-category="All">All crops</button><button class="filter" data-category="Grains">Grains</button><button class="filter" data-category="Fruits">Fruits</button><button class="filter" data-category="Vegetables">Vegetables</button><button class="filter" data-category="Cash crops">Cash crops</button><button class="filter" data-category="Other">Other</button></div><div class="crop-grid" id="cropGrid"></div><div style="text-align:center;margin-top:20px"><button class="btn btn-outline" onclick="openModal('listing')">＋ List your crop</button></div></section>
-
-<!-- REAL AI - NOW SECURE VIA VERCEL ENV -->
-<section class="section container" id="ai-assistant">
-  <div class="ai-panel">
-    <div>
-      <span class="eyebrow" style="background:var(--green);color:white">🤖 REAL AI POWERED</span>
-      <h2 style="font-size:32px;letter-spacing:-1px;margin:15px 0">Ask HarvestChain AI anything</h2>
-      <p style="color:#5a7260;line-height:1.7">Prices in KSh, buyers in Kirinyaga/Mwea, M-Pesa tips, cooperatives, transport — powered by Groq, key hidden securely in Vercel.</p>
-      <div style="margin-top:15px;background:white;border-radius:12px;padding:12px;font-size:13px">✅ Secure: API key in Vercel Environment<br>✅ No key exposed in frontend</div>
-    </div>
-    <div class="ai-box">
-      <input id="aiChatInput" placeholder="e.g. Best price for tomatoes in Mwea today? Buyer for 500kg maize?">
-      <button id="aiBtn" class="btn btn-primary" style="width:100%" onclick="askRealAI()">Ask AI ↗</button>
-      <div id="aiAnswer" class="ai-answer"></div>
-    </div>
-  </div>
-</section>
-
+<section class="section container" id="ai-assistant"><div class="ai-panel"><div><span class="eyebrow" style="background:var(--green);color:white">🤖 REAL AI POWERED</span><h2 style="font-size:32px;margin:15px 0">Ask HarvestChain AI anything</h2><p>Prices in KSh, buyers in Kirinyaga/Mwea, M-Pesa tips — powered by Groq, key hidden in Vercel.</p></div><div class="ai-box"><input id="aiChatInput" placeholder="e.g. Best price for tomatoes in Mwea today?"><button id="aiBtn" class="btn btn-primary" style="width:100%;margin-top:10px" onclick="askRealAI()">Ask AI ↗</button><div id="aiAnswer" class="ai-answer"></div></div></div></section>
 </main>
-<footer><div class="container"><p>© <span id="year"></span> HarvestChain AI — harvestchain-ai.vercel.app</p></div></footer>
+<footer><div class="container"><p>© <span id="year"></span> HarvestChain AI</p></div></footer>
 <div class="notice" id="notice"></div>
 <div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this)closeModal()"><div class="modal"><h2 id="modalTitle"></h2><p id="modalDescription"></p><form id="appForm"><div id="formFields"></div><div class="modal-actions"><button class="btn btn-outline" type="button" onclick="closeModal()">Cancel</button><button class="btn btn-primary" id="submitButton" type="submit">Continue</button></div></form></div></div>
 <script>
-  const SUPABASE_URL = "https://afohakpkylngutenuryc.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as";
+  // ✅ CORRECT PROJECT NOW
+  const SUPABASE_URL = "https://afohekpkylngutenuryc.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_mL-rnPWjBhsCUvXMyEXSoQ_jfoW1S7B";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const crops = [
@@ -75,59 +55,36 @@
     {name:"Beans",category:"Grains",emoji:"🫘",description:"Legumes"},
     {name:"Avocados",category:"Fruits",emoji:"🥑",description:"Fresh fruit"},
     {name:"Mangoes",category:"Fruits",emoji:"🥭",description:"Fresh fruit"},
-    {name:"Bananas",category:"Fruits",emoji:"🍌",description:"Fresh fruit"},
     {name:"Tomatoes",category:"Vegetables",emoji:"🍅",description:"Fresh vegetables"},
-    {name:"Potatoes",category:"Vegetables",emoji:"🥔",description:"Root vegetables"},
-    {name:"Onions",category:"Vegetables",emoji:"🧅",description:"Fresh vegetables"},
-    {name:"Coffee",category:"Cash crops",emoji:"☕",description:"Coffee beans"},
-    {name:"Tea",category:"Cash crops",emoji:"🍃",description:"Tea leaves"},
-    {name:"Sugarcane",category:"Cash crops",emoji:"🎋",description:"Industrial crop"}
+    {name:"Coffee",category:"Cash crops",emoji:"☕",description:"Coffee beans"}
   ];
 
-  let selectedCategory="All",liveCrops=[],currentModal="join",selectedCrop="",currentUser=null,currentProfile=null;
+  let selectedCategory="All",liveCrops=[],currentModal="join",currentUser=null,currentProfile=null;
   function showNotice(m){const n=document.getElementById("notice");n.textContent=m;n.classList.add("show");clearTimeout(showNotice.timer);showNotice.timer=setTimeout(()=>n.classList.remove("show"),6000)}
   function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]))}
   function escapeJS(v){return String(v??"").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/[\r\n]/g," ")}
   async function ensureProfile(user,fallback={}){if(!user)return null;const{data:existing}=await supabaseClient.from("profiles").select("*").eq("user_id",user.id).maybeSingle();if(existing)return existing;const meta=user.user_metadata||{};const{data:profile}=await supabaseClient.from("profiles").insert({user_id:user.id,full_name:fallback.full_name||meta.full_name||user.email||"HarvestChain user",role:fallback.role||meta.role||"farmer",county:fallback.county||meta.county||""}).select("*").single();return profile}
-  async function refreshSession(){const{data}=await supabaseClient.auth.getSession();currentUser=data.session?.user||null;if(currentUser){try{currentProfile=await ensureProfile(currentUser)}catch(e){}}updateAccountButton()}
+  async function refreshSession(){const{data}=await supabaseClient.auth.getSession();currentUser=data.session?.user||null;if(currentUser){try{currentProfile=await ensureProfile(currentUser)}catch(e){console.log(e)}}updateAccountButton()}
   function updateAccountButton(){const b=document.querySelector("header .nav > button");if(!b)return;if(currentUser){const name=currentProfile?.full_name||currentUser.email||"My account";b.textContent=name.length>16?name.slice(0,16)+'…':name;b.onclick=()=>openModal("account")}else{b.textContent="Get started";b.onclick=()=>openModal("join")}}
-  async function loadLiveCrops(){const{data,error}=await supabaseClient.from("crop_listings").select("id,farmer_id,crop_name,category,quantity,unit,county,price_kes,description,created_at").order("created_at",{ascending:false});if(error){console.error(error);liveCrops=[]}else{liveCrops=(data||[]).map(item=>({id:item.id,name:item.crop_name,category:item.category||"Other",emoji:item.category==="Fruits"?"🍎":item.category==="Vegetables"?"🥬":item.category==="Grains"?"🌾":"🌱",description:[item.quantity?`${item.quantity} ${item.unit||""}`.trim():"",item.county||"",item.price_kes!=null?`KSh ${item.price_kes}`:""].filter(Boolean).join(" · "),live:true}))}renderCrops()}
+  async function loadLiveCrops(){const{data,error}=await supabaseClient.from("crop_listings").select("id,farmer_id,crop_name,category,quantity,unit,county,price_kes,description,created_at").order("created_at",{ascending:false});if(error){console.error(error);liveCrops=[]}else{liveCrops=(data||[]).map(item=>({id:item.id,name:item.crop_name,category:item.category||"Other",emoji:"🌱",description:[item.quantity?`${item.quantity} ${item.unit||""}`.trim():"",item.county||"",item.price_kes!=null?`KSh ${item.price_kes}`:""].filter(Boolean).join(" · "),live:true}))}renderCrops()}
   function renderCrops(){const q=document.getElementById("searchInput").value.trim().toLowerCase();const grid=document.getElementById("cropGrid");const all=[...liveCrops,...crops.map(c=>({...c,demo:true}))];const res=all.filter(c=>(selectedCategory==="All"||c.category===selectedCategory)&&[c.name,c.category,c.description].some(v=>String(v||"").toLowerCase().includes(q)));if(!res.length){grid.innerHTML='<div style="grid-column:1/-1;padding:30px;text-align:center;background:white;border-radius:15px">No matching crops found.</div>';return}grid.innerHTML=res.map(c=>`<article class="crop-card"><div class="crop-emoji">${escapeHTML(c.emoji)}</div><h3>${escapeHTML(c.name)}</h3><p>${escapeHTML(c.description||"")}</p><div style="font-size:12px;color:#176b43;margin-bottom:14px">● ${escapeHTML(c.category)}${c.live?" · Live":" · Example"}</div><button class="btn btn-outline" onclick="${c.live?`openModal('enquiry','${escapeJS(c.name)}','${escapeJS(c.id)}')`:`showNotice('Example crop - sign in and use live listings')`}">${c.live?"I'm interested":"Example crop"}</button></article>`).join("")}
   document.getElementById("filters").addEventListener("click",e=>{const b=e.target.closest("button[data-category]");if(!b)return;selectedCategory=b.dataset.category;document.querySelectorAll(".filter").forEach(x=>x.classList.toggle("active",x===b));renderCrops()});
   document.getElementById("searchInput").addEventListener("input",renderCrops);
   document.getElementById("year").textContent=new Date().getFullYear();
-  
-  // SECURE AI - Calls your Vercel /api/chat
   async function askRealAI(){
-    const inputEl = document.getElementById("aiChatInput");
-    const box = document.getElementById("aiAnswer");
-    const btn = document.getElementById("aiBtn");
-    const input = inputEl.value.trim();
-    if(!input){ showNotice("Ask something e.g. Tomato price Mwea"); return; }
-    btn.disabled=true; btn.textContent="Thinking...";
-    box.style.display="block";
-    box.textContent="🌱 Checking Kirinyaga markets...";
+    const inputEl=document.getElementById("aiChatInput"),box=document.getElementById("aiAnswer"),btn=document.getElementById("aiBtn");
+    const input=inputEl.value.trim(); if(!input){showNotice("Ask something");return;}
+    btn.disabled=true; btn.textContent="Thinking..."; box.style.display="block"; box.textContent="🌱 Checking Kirinyaga markets...";
     try{
-      const res = await fetch("/api/chat", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({message: input})
-      });
-      const data = await res.json();
-      if(data.error) throw new Error(data.error.message || JSON.stringify(data));
-      const answer = data.choices?.[0]?.message?.content || "No answer";
-      box.innerHTML = escapeHTML(answer) + `<br><br><button class="btn btn-primary" onclick="openModal('listing')">List crop from this</button>`;
-    }catch(e){
-      box.textContent="Error: "+e.message+" - Check Vercel env GROQ_API_KEY and redeploy.";
-    }finally{
-      btn.disabled=false; btn.textContent="Ask AI ↗";
-    }
+      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:input})});
+      const data=await res.json(); if(data.error) throw new Error(data.error.message||JSON.stringify(data));
+      const answer=data.choices?.[0]?.message?.content||"No answer"; box.textContent=answer;
+    }catch(e){ box.textContent="Error: "+e.message; }finally{ btn.disabled=false; btn.textContent="Ask AI ↗"; }
   }
-
-  function openModal(type,cropName="",listingId=""){currentModal=type;selectedCrop=cropName;const back=document.getElementById("modalBackdrop"),title=document.getElementById("modalTitle"),desc=document.getElementById("modalDescription"),fields=document.getElementById("formFields");if(type==="join"){title.textContent="Join HarvestChain AI";desc.textContent="Create an account as a farmer or buyer.";fields.innerHTML=`<label>I am joining as</label><select id="role" name="role" required><option value="farmer">Farmer / crop supplier</option><option value="buyer">Buyer / wholesaler / business</option></select><label>Full name</label><input id="fullName" name="fullName" required placeholder="Your full name"><label>Email</label><input id="email" name="email" type="email" required placeholder="you@example.com"><label>Password</label><input id="password" name="password" type="password" required minlength="8" placeholder="At least 8 characters"><label>County</label><input id="county" name="county" required placeholder="e.g. Kirinyaga"><p style="font-size:12px">Already? <a href="#" onclick="event.preventDefault();openModal('login')" style="color:#176b43;font-weight:700">Sign in</a></p>`}else if(type==="login"){title.textContent="Sign in";desc.textContent="Sign in to publish crops or contact suppliers.";fields.innerHTML=`<label>Email</label><input id="email" name="email" type="email" required><label>Password</label><input id="password" name="password" type="password" required><p style="font-size:12px">New? <a href="#" onclick="event.preventDefault();openModal('join')" style="color:#176b43;font-weight:700">Create account</a></p>`}else if(type==="account"){title.textContent="Your account";desc.textContent="Manage session.";fields.innerHTML=`<p><strong>Name:</strong> ${escapeHTML(currentProfile?.full_name||currentUser?.email||"")}</p><p><strong>Role:</strong> ${escapeHTML(currentProfile?.role||"")}</p><button type="button" class="btn btn-outline" style="width:100%" onclick="openModal('listing')">＋ List your crop</button><button type="button" class="btn btn-outline" style="width:100%;margin-top:8px" onclick="signOut()">Sign out</button>`}else if(type==="listing"){title.textContent="List your crop";desc.textContent="Your listing will be saved to live marketplace.";fields.innerHTML=`<label>Crop name</label><input id="cropName" name="cropName" required placeholder="e.g. Green grams"><label>Category</label><select id="cropCategory" name="cropCategory" required><option>Grains</option><option>Fruits</option><option>Vegetables</option><option>Cash crops</option><option>Other</option></select><label>Quantity</label><input id="quantity" name="quantity" type="number" min="0.01" step="any" required><label>Unit</label><select id="unit" name="unit" required><option>kg</option><option>tonnes</option><option>bags</option><option>crates</option><option>pieces</option></select><label>County</label><input id="location" name="location" required placeholder="e.g. Kirinyaga"><label>Price KSh</label><input id="price" name="price" type="number" min="0" step="0.01"><label>Description</label><textarea id="description" name="description" placeholder="Quality, harvest date..."></textarea>`}else if(type==="enquiry"){title.textContent="Crop enquiry";desc.textContent="Send enquiry to farmer.";fields.innerHTML=`<input type="hidden" name="listingId" value="${escapeHTML(listingId)}"><label>Crop</label><input id="enquiryCrop" name="enquiryCrop" readonly value="${escapeHTML(cropName)}"><label>Quantity needed</label><input id="buyerQuantity" name="buyerQuantity" placeholder="2 tonnes"><label>Message</label><textarea id="message" name="message" required placeholder="Tell farmer what you need..."></textarea>`}back.classList.add("show")}
+  function openModal(type,cropName="",listingId=""){currentModal=type;const back=document.getElementById("modalBackdrop"),title=document.getElementById("modalTitle"),desc=document.getElementById("modalDescription"),fields=document.getElementById("formFields");if(type==="join"){title.textContent="Join HarvestChain AI";desc.textContent="Create an account as a farmer or buyer.";fields.innerHTML=`<label>I am joining as</label><select id="role" name="role" required><option value="farmer">Farmer / crop supplier</option><option value="buyer">Buyer / wholesaler / business</option></select><label>Full name</label><input id="fullName" name="fullName" required placeholder="Your full name"><label>Email</label><input id="email" name="email" type="email" required placeholder="you@example.com"><label>Password</label><input id="password" name="password" type="password" required minlength="8" placeholder="At least 8 characters"><label>County</label><input id="county" name="county" required placeholder="e.g. Kirinyaga">`}else if(type==="login"){title.textContent="Sign in";desc.textContent="Sign in to publish crops.";fields.innerHTML=`<label>Email</label><input id="email" name="email" type="email" required><label>Password</label><input id="password" name="password" type="password" required>`}else if(type==="account"){title.textContent="Your account";desc.textContent="Manage session.";fields.innerHTML=`<p><strong>Name:</strong> ${escapeHTML(currentProfile?.full_name||currentUser?.email||"")}</p><p><strong>Role:</strong> ${escapeHTML(currentProfile?.role||"")}</p><button type="button" class="btn btn-outline" style="width:100%" onclick="openModal('listing')">＋ List your crop</button><button type="button" class="btn btn-outline" style="width:100%;margin-top:8px" onclick="signOut()">Sign out</button>`}else if(type==="listing"){title.textContent="List your crop";desc.textContent="Your listing will be saved to live marketplace.";fields.innerHTML=`<label>Crop name</label><input id="cropName" name="cropName" required><label>Category</label><select id="cropCategory" name="cropCategory" required><option>Grains</option><option>Fruits</option><option>Vegetables</option><option>Cash crops</option><option>Other</option></select><label>Quantity</label><input id="quantity" name="quantity" type="number" min="0.01" step="any" required><label>Unit</label><select id="unit" name="unit" required><option>kg</option><option>tonnes</option><option>bags</option><option>crates</option><option>pieces</option></select><label>County</label><input id="location" name="location" required placeholder="e.g. Kirinyaga"><label>Price KSh</label><input id="price" name="price" type="number" min="0" step="0.01"><label>Description</label><textarea id="description" name="description"></textarea>`}else if(type==="enquiry"){title.textContent="Crop enquiry";desc.textContent="Send enquiry to farmer.";fields.innerHTML=`<input type="hidden" name="listingId" value="${escapeHTML(listingId)}"><label>Crop</label><input id="enquiryCrop" name="enquiryCrop" readonly value="${escapeHTML(cropName)}"><label>Quantity needed</label><input id="buyerQuantity" name="buyerQuantity"><label>Message</label><textarea id="message" name="message" required></textarea>`}back.classList.add("show")}
   function closeModal(){document.getElementById("modalBackdrop").classList.remove("show")}
   async function signOut(){await supabaseClient.auth.signOut();currentUser=null;currentProfile=null;updateAccountButton();closeModal();showNotice("Signed out")}
-  document.getElementById("appForm").addEventListener("submit",async e=>{e.preventDefault();const btn=document.getElementById("submitButton");const data=Object.fromEntries(new FormData(e.target).entries());btn.disabled=true;btn.textContent="Saving to cloud...";try{if(currentModal==="join"){const{data:res,error}=await supabaseClient.auth.signUp({email:data.email.trim(),password:data.password,options:{data:{full_name:data.fullName.trim(),role:data.role,county:data.county.trim()}}});if(error)throw error;if(res.session){currentUser=res.user;currentProfile=await ensureProfile(res.user,{full_name:data.fullName.trim(),role:data.role,county:data.county.trim()});updateAccountButton();closeModal();e.target.reset();showNotice("Welcome "+data.fullName+"! Account ready.")}else{closeModal();e.target.reset();showNotice("Check email to confirm account")}return}if(currentModal==="login"){const{data:res,error}=await supabaseClient.auth.signInWithPassword({email:data.email.trim(),password:data.password});if(error)throw error;currentUser=res.user;currentProfile=await ensureProfile(res.user);updateAccountButton();closeModal();e.target.reset();showNotice("Welcome back!");return}if(currentModal==="listing"){if(!currentUser){openModal("login");showNotice("Sign in first");return}if(currentProfile?.role!=="farmer"){showNotice("Only farmer accounts can publish");return}const{error}=await supabaseClient.from("crop_listings").insert({farmer_id:currentUser.id,crop_name:data.cropName.trim(),category:data.cropCategory,quantity:Number(data.quantity),unit:data.unit,county:data.location.trim(),price_kes:data.price===""?null:Number(data.price),description:data.description.trim()});if(error)throw error;closeModal();e.target.reset();await loadLiveCrops();showNotice("Crop published to cloud!");return}if(currentModal==="enquiry"){if(!currentUser){openModal("login");showNotice("Sign in as buyer first");return}const{error}=await supabaseClient.from("enquiries").insert({buyer_id:currentUser.id,listing_id:data.listingId,message:data.message.trim(),quantity_requested:data.buyerQuantity.trim()||null});if(error)throw error;closeModal();e.target.reset();showNotice("Enquiry sent to farmer!");return}}catch(err){showNotice(err.message||"Error - run SQL tables first!")}finally{btn.disabled=false;btn.textContent="Continue"}});
+  document.getElementById("appForm").addEventListener("submit",async e=>{e.preventDefault();const btn=document.getElementById("submitButton");const data=Object.fromEntries(new FormData(e.target).entries());btn.disabled=true;btn.textContent="Saving to cloud...";try{if(currentModal==="join"){const{data:res,error}=await supabaseClient.auth.signUp({email:data.email.trim(),password:data.password,options:{data:{full_name:data.fullName.trim(),role:data.role,county:data.county.trim()}}});if(error)throw error;if(res.session){currentUser=res.user;currentProfile=await ensureProfile(res.user,{full_name:data.fullName.trim(),role:data.role,county:data.county.trim()});updateAccountButton();closeModal();e.target.reset();showNotice("Welcome "+data.fullName+"! Account ready.")}else{closeModal();e.target.reset();showNotice("Check email to confirm account")}return}if(currentModal==="login"){const{data:res,error}=await supabaseClient.auth.signInWithPassword({email:data.email.trim(),password:data.password});if(error)throw error;currentUser=res.user;currentProfile=await ensureProfile(res.user);updateAccountButton();closeModal();e.target.reset();showNotice("Welcome back!");return}if(currentModal==="listing"){if(!currentUser){openModal("login");showNotice("Sign in first");return}const{error}=await supabaseClient.from("crop_listings").insert({farmer_id:currentUser.id,crop_name:data.cropName.trim(),category:data.cropCategory,quantity:Number(data.quantity),unit:data.unit,county:data.location.trim(),price_kes:data.price===""?null:Number(data.price),description:data.description.trim()});if(error)throw error;closeModal();e.target.reset();await loadLiveCrops();showNotice("Crop published!");return}if(currentModal==="enquiry"){if(!currentUser){openModal("login");showNotice("Sign in as buyer first");return}const{error}=await supabaseClient.from("enquiries").insert({buyer_id:currentUser.id,listing_id:data.listingId,message:data.message.trim(),quantity_requested:data.buyerQuantity.trim()||null});if(error)throw error;closeModal();e.target.reset();showNotice("Enquiry sent!");return}}catch(err){showNotice(err.message||"Error - run SQL tables first!")}finally{btn.disabled=false;btn.textContent="Continue"}});
   supabaseClient.auth.onAuthStateChange((_e,s)=>{currentUser=s?.user||null;updateAccountButton()});
   renderCrops();refreshSession();loadLiveCrops();
 </script>
