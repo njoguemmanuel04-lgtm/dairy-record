@@ -1,180 +1,1008 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HarvestChain AI</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-body{margin:0;font:16px Arial;background:#f3f8f3;color:#173b28}
-header{background:#124b30;color:white;padding:20px}
-main{max-width:850px;margin:auto;padding:20px}
-section{background:white;padding:20px;border-radius:14px;margin:15px 0}
-input,select,textarea,button{box-sizing:border-box;width:100%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #ccc}
-button{background:#176b45;color:white;border:0;font-weight:bold}
-.card{border:1px solid #ddd;padding:15px;border-radius:10px;margin:10px 0}
-small{color:#53685a}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#176b43">
+  <meta name="description" content="HarvestChain AI connects Kenyan farmers with buyers, markets and agricultural opportunities.">
+  <title>HarvestChain AI | Kenya's Smart Agriculture Marketplace</title>
+
+  <!-- Supabase browser client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --green: #176b43;
+      --deep: #10452e;
+      --lime: #dff2c2;
+      --bg: #f6f8f4;
+      --white: #ffffff;
+      --text: #183529;
+      --muted: #718176;
+      --border: #e4eae3;
+      --gold: #f4bd56;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    button, input, select, textarea { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1160px, 92%); margin: auto; }
+
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      background: var(--green);
+      color: white;
+      border-radius: 14px;
+      font-size: 25px;
+    }
+    .brand strong { display: block; font-size: 18px; letter-spacing: -.5px; }
+    .brand small { color: var(--muted); font-size: 10px; letter-spacing: 1px; }
+    .nav-links { display: flex; gap: 24px; align-items: center; font-size: 14px; }
+    .nav-links a:hover { color: var(--green); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 0;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: .2s;
+    }
+    .btn-primary { background: var(--green); color: white; }
+    .btn-primary:hover { background: var(--deep); }
+    .btn-light { background: white; color: var(--green); }
+    .btn-outline { border: 1px solid var(--border); background: white; color: var(--text); }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    .hero { padding: 48px 0 32px; }
+    .hero-panel {
+      background: linear-gradient(120deg, #10452e, #20764b);
+      color: white;
+      border-radius: 28px;
+      padding: clamp(25px, 5vw, 62px);
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 25px;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .eyebrow {
+      display: inline-block;
+      background: #ffffff20;
+      border: 1px solid #ffffff35;
+      padding: 8px 12px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .4px;
+    }
+    h1 {
+      font-size: clamp(36px, 5vw, 60px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin: 20px 0;
+    }
+    .hero p { color: #e0eee3; line-height: 1.8; max-width: 550px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 25px; }
+    .hero-art { text-align: center; font-size: clamp(100px, 18vw, 190px); }
+    .hero-art small { display: block; font-size: 14px; color: #dceadd; letter-spacing: 2px; }
+
+    .section { padding: 30px 0; }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .section-head h2 { margin: 0 0 7px; font-size: clamp(23px, 4vw, 30px); letter-spacing: -.8px; }
+    .section-head p { color: var(--muted); margin: 0; font-size: 14px; line-height: 1.6; }
+
+    .searchbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: white;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      margin: 25px 0 18px;
+    }
+    .searchbar input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      padding: 10px 5px;
+      background: transparent;
+    }
+    .filters { display: flex; gap: 8px; overflow-x: auto; padding: 3px 0 12px; }
+    .filter {
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 9px 14px;
+      background: white;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .filter.active { background: var(--green); color: white; border-color: var(--green); }
+
+    .crop-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .crop-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 19px;
+      padding: 17px;
+      min-width: 0;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .crop-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px #173d2910; }
+    .crop-emoji {
+      height: 110px;
+      display: grid;
+      place-items: center;
+      background: #eff5e9;
+      border-radius: 13px;
+      font-size: 55px;
+      margin-bottom: 15px;
+    }
+    .crop-card h3 { font-size: 17px; margin: 0 0 7px; }
+    .crop-card p { font-size: 12px; color: var(--muted); margin: 0 0 13px; }
+    .crop-meta { font-size: 12px; display: flex; align-items: center; gap: 5px; color: var(--green); margin-bottom: 14px; }
+    .crop-card .btn { width: 100%; padding: 10px 8px; }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .feature {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 23px;
+    }
+    .feature-icon {
+      height: 48px; width: 48px; border-radius: 14px;
+      background: #e8f3e4; display: grid; place-items: center; font-size: 24px;
+    }
+    .feature h3 { margin: 17px 0 8px; font-size: 17px; }
+    .feature p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+
+    .ai-panel {
+      background: #eaf3e5;
+      border: 1px solid #d9e8d1;
+      border-radius: 23px;
+      padding: clamp(22px, 4vw, 35px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 25px;
+    }
+    .ai-panel h2 { font-size: 28px; letter-spacing: -.8px; margin: 12px 0; }
+    .ai-panel p { color: #607465; font-size: 14px; line-height: 1.8; }
+    .ai-box { background: white; border-radius: 17px; padding: 18px; }
+    .ai-box label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+    .ai-box select, .ai-box input {
+      width: 100%; border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; margin-bottom: 12px; background: white; color: var(--text);
+    }
+    .ai-box .btn { width: 100%; }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .step { padding: 22px; background: white; border: 1px solid var(--border); border-radius: 17px; }
+    .step-number { font-size: 13px; color: var(--green); font-weight: 800; }
+    .step h3 { font-size: 17px; margin: 10px 0; }
+    .step p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    .cta {
+      background: var(--deep); color: white; padding: 38px 25px;
+      border-radius: 24px; text-align: center;
+    }
+    .cta h2 { margin: 0 0 12px; font-size: clamp(25px, 4vw, 36px); }
+    .cta p { color: #d7e8db; line-height: 1.7; font-size: 14px; }
+
+    footer { margin-top: 45px; padding: 30px 0 95px; border-top: 1px solid var(--border); }
+    .footer-row { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    footer p { font-size: 12px; color: var(--muted); line-height: 1.8; }
+
+    .mobile-nav {
+      display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
+      background: white; border-top: 1px solid var(--border);
+      padding: 10px 4px calc(10px + env(safe-area-inset-bottom));
+      justify-content: space-around;
+    }
+    .mobile-nav a { text-align: center; color: var(--muted); font-size: 11px; }
+    .mobile-nav span { display: block; font-size: 20px; margin-bottom: 4px; }
+
+    .notice {
+      display: none; position: fixed; z-index: 60; bottom: 85px; left: 5%; width: 90%;
+      max-width: 420px; background: #183529; color: white; border-radius: 14px;
+      padding: 15px 17px; box-shadow: 0 10px 35px #0002; font-size: 14px; line-height: 1.6;
+    }
+    .notice.show { display: block; }
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 50;
+      background: #10251dcc; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal { width: 100%; max-width: 450px; max-height: 85vh; overflow: auto; background: white; border-radius: 20px; padding: 24px; }
+    .modal h2 { margin-top: 0; }
+    .modal label { display: block; font-size: 13px; font-weight: 700; margin: 13px 0 6px; }
+    .modal input, .modal select, .modal textarea {
+      width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px;
+    }
+    .modal textarea { min-height: 90px; resize: vertical; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+    .modal-actions button { flex: 1; }
+    .empty { grid-column: 1/-1; padding: 30px; text-align: center; color: var(--muted); background: white; border-radius: 15px; }
+
+    @media (max-width: 850px) {
+      .nav-links { display: none; }
+      .hero-panel { grid-template-columns: 1fr; }
+      .hero-art { display: none; }
+      .crop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .crop-emoji { height: 90px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .ai-panel { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .mobile-nav { display: flex; }
+      .hero { padding-top: 22px; }
+    }
+    @media (max-width: 390px) {
+      .brand strong { font-size: 15px; }
+      .brand small { font-size: 8px; }
+      .nav > .btn { padding: 10px; font-size: 12px; }
+      .crop-card { padding: 12px; }
+    }
+  </style>
 </head>
 <body>
+
 <header>
-<h1>🌱 HarvestChain AI</h1>
-<p>Connecting farmers and buyers across Kenya</p>
-<button onclick="signOut()">Sign out</button>
+  <div class="container nav">
+    <a href="#" class="brand" aria-label="HarvestChain home">
+      <div class="brand-icon">🌱</div>
+      <div>
+        <strong>HarvestChain AI</strong>
+        <small>KENYA AGRICULTURAL MARKETPLACE</small>
+      </div>
+    </a>
+    <nav class="nav-links">
+      <a href="#marketplace">Marketplace</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#ai-assistant">AI assistant</a>
+    </nav>
+    <button class="btn btn-primary" onclick="openModal('join')">Get started</button>
+  </div>
 </header>
 
 <main>
-<section>
-<h2>Create account / Sign in</h2>
-<input id="name" placeholder="Full name (registration only)">
-<input id="email" type="email" placeholder="Email" required>
-<input id="password" type="password" placeholder="Password (minimum 8 characters)" required>
-<select id="role"><option value="farmer">Farmer</option><option value="buyer">Buyer</option></select>
-<input id="county" placeholder="County">
-<button onclick="register()">Register</button>
-<button onclick="login()">Sign in</button>
-<p id="authMsg"></p>
-</section>
+  <section class="hero container">
+    <div class="hero-panel">
+      <div>
+        <span class="eyebrow">🌍 BUILT FOR KENYA'S AGRICULTURE</span>
+        <h1>Your farm.<br>Your market.<br>Your opportunity.</h1>
+        <p>Connect with buyers, discover new markets, and make smarter agricultural business decisions with HarvestChain AI.</p>
+        <div class="hero-actions">
+          <a class="btn btn-light" href="#marketplace">Explore crops ↗</a>
+          <button class="btn" style="background:#ffffff20;color:white;border:1px solid #ffffff50" onclick="openModal('join')">Join HarvestChain</button>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        🌾
+        <small>GROW · CONNECT · SELL</small>
+      </div>
+    </div>
+  </section>
 
-<section>
-<h2>🌽 Publish crop listing</h2>
-<input id="crop" placeholder="Crop name">
-<select id="category">
-<option>Cereals</option><option>Fruits</option><option>Vegetables</option>
-<option>Legumes</option><option>Other</option>
-</select>
-<input id="quantity" type="number" min="0.01" placeholder="Quantity">
-<select id="unit"><option>kg</option><option>tonnes</option><option>bags</option><option>crates</option></select>
-<input id="price" type="number" min="0" placeholder="Price in KSh per unit (optional)">
-<input id="cropCounty" placeholder="County">
-<textarea id="description" placeholder="Description (optional)"></textarea>
-<button onclick="publishCrop()">Publish produce</button>
-<p id="cropMsg"></p>
-</section>
+  <section class="section container" id="marketplace">
+    <div class="section-head">
+      <div>
+        <h2>Explore the marketplace</h2>
+        <p>Discover crops and connect with agricultural suppliers.</p>
+      </div>
+    </div>
 
-<section>
-<h2>🛒 Available produce</h2>
-<button onclick="loadCrops()">Refresh listings</button>
-<div id="crops">Loading listings...</div>
-</section>
+    <div class="searchbar">
+      <span>🔎</span>
+      <input id="searchInput" type="search" placeholder="Search maize, rice, avocados..." aria-label="Search crops">
+      <button class="btn btn-primary" onclick="renderCrops()">Search</button>
+    </div>
+    <div class="filters" id="filters">
+      <button class="filter active" data-category="All">All crops</button>
+      <button class="filter" data-category="Grains">Grains</button>
+      <button class="filter" data-category="Fruits">Fruits</button>
+      <button class="filter" data-category="Vegetables">Vegetables</button>
+      <button class="filter" data-category="Cash crops">Cash crops</button>
+      <button class="filter" data-category="Other">Other</button>
+    </div>
+    <div class="crop-grid" id="cropGrid"></div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn btn-outline" onclick="openModal('listing')">＋ List your crop</button>
+    </div>
+  </section>
 
-<section>
-<h2>✉️ Buyer enquiry</h2>
-<input id="listingId" placeholder="Listing ID">
-<input id="requested" type="number" min="0.01" placeholder="Quantity needed (optional)">
-<textarea id="message" placeholder="Message to farmer"></textarea>
-<button onclick="sendEnquiry()">Send enquiry</button>
-<p id="enquiryMsg"></p>
-</section>
+  <section class="section container">
+    <div class="section-head">
+      <div>
+        <h2>A smarter way to trade crops</h2>
+        <p>Tools designed to help farmers and businesses work together.</p>
+      </div>
+    </div>
+    <div class="feature-grid">
+      <article class="feature">
+        <div class="feature-icon">🤝</div>
+        <h3>Find reliable buyers</h3>
+        <p>Give buyers a clear view of your available produce, location, quantity, and harvest schedule.</p>
+      </article>
+      <article class="feature">
+        <div class="feature-icon">📊</div>
+        <h3>Make informed decisions</h3>
+        <p>Use verified market information and available price comparisons to plan your sales.</p>
+      </article>
+      <article class="feature">
+        <div class="feature-icon">🚚</div>
+        <h3>Manage your orders</h3>
+        <p>Keep track of buyer enquiries, agreements, delivery arrangements, and completed deals.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section container" id="ai-assistant">
+    <div class="ai-panel">
+      <div>
+        <span class="eyebrow" style="background:#d8e9ce;color:#176b43;border-color:#d8e9ce">✦ SMART AGRICULTURE</span>
+        <h2>Meet your AI farm business assistant.</h2>
+        <p>Explore ideas for finding buyers, planning harvests, comparing market opportunities, and improving your agricultural business.</p>
+        <p><strong>Our goal:</strong> useful tools for farmers, traders, and agricultural businesses across Kenya.</p>
+      </div>
+      <div class="ai-box">
+        <label for="aiTopic">What do you need help with?</label>
+        <select id="aiTopic">
+          <option value="buyers">Finding buyers for my crops</option>
+          <option value="prices">Understanding crop prices</option>
+          <option value="planning">Planning my harvest</option>
+          <option value="business">Growing my farm business</option>
+        </select>
+        <label for="aiCrop">Which crop?</label>
+        <input id="aiCrop" placeholder="e.g. maize, rice, tomatoes">
+        <button class="btn btn-primary" onclick="askAI()">Get guidance ↗</button>
+        <p style="font-size:11px;margin-bottom:0">The first version provides general guidance. Live AI answers require a secure AI service integration.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section container" id="how-it-works">
+    <div class="section-head">
+      <div>
+        <h2>Getting started is simple</h2>
+        <p>Designed for both smallholder farmers and large businesses.</p>
+      </div>
+    </div>
+    <div class="steps">
+      <article class="step">
+        <span class="step-number">STEP 01</span>
+        <h3>Create your account</h3>
+        <p>Join as a farmer or a buyer. Basic farmer registration is free.</p>
+      </article>
+      <article class="step">
+        <span class="step-number">STEP 02</span>
+        <h3>List or find produce</h3>
+        <p>Publish your available crops or search for suppliers who match your needs.</p>
+      </article>
+      <article class="step">
+        <span class="step-number">STEP 03</span>
+        <h3>Connect and trade</h3>
+        <p>Discuss terms, agree on delivery, and track your deal through the platform as these features become available.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section container">
+    <div class="cta">
+      <h2>Let's grow Kenya's agricultural future.</h2>
+      <p>Join a marketplace built to help farmers and buyers find better opportunities.</p>
+      <button class="btn btn-light" onclick="openModal('join')">Join HarvestChain AI ↗</button>
+    </div>
+  </section>
 </main>
 
-<script>
-const URL="https://afohekpkylngutenuryc.supabase.co";
-const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as";
-const db=window.supabase.createClient(URL,KEY);
-const $=id=>document.getElementById(id);
-let user=null,profile=null;
+<footer>
+  <div class="container footer-row">
+    <div>
+      <a href="#" class="brand">
+        <div class="brand-icon">🌱</div>
+        <div><strong>HarvestChain AI</strong><small>GROW · CONNECT · SELL</small></div>
+      </a>
+      <p>Connecting Kenya's agricultural ecosystem.<br>Built for farmers, buyers, and businesses.</p>
+    </div>
+    <div>
+      <strong>Explore</strong>
+      <p><a href="#marketplace">Crop marketplace</a><br><a href="#ai-assistant">AI assistant</a><br><a href="#how-it-works">How it works</a></p>
+    </div>
+  </div>
+  <div class="container"><p>© <span id="year"></span> HarvestChain AI. All rights reserved.<br>Market listings and guidance must be verified before making business decisions.</p></div>
+</footer>
 
-async function session(){
- const {data}=await db.auth.getSession();
- user=data.session?.user||null;
- if(user) await ensureProfile();
-}
-async function ensureProfile(){
- const {data,error}=await db.from("profiles").select("*").eq("user_id",user.id).maybeSingle();
- if(error) throw error;
- if(data){profile=data;return;}
- const m=user.user_metadata||{};
- const {data:created,error:e}=await db.from("profiles").insert({
-  user_id:user.id,full_name:m.full_name||user.email,
-  role:m.role||"buyer",county:m.county||null
- }).select().single();
- if(e) throw e;
- profile=created;
-}
-async function register(){
- try{
-  const {data,error}=await db.auth.signUp({email:$("email").value,password:$("password").value,
-   options:{data:{full_name:$("name").value.trim(),role:$("role").value,county:$("county").value.trim()}}});
-  if(error)throw error;
-  user=data.user;
-  if(data.session){await ensureProfile();$("authMsg").textContent="Account created and signed in.";}
-  else $("authMsg").textContent="Check your email to confirm your account, then sign in.";
- }catch(e){$("authMsg").textContent=e.message;}
-}
-async function login(){
- try{
-  const {data,error}=await db.auth.signInWithPassword({email:$("email").value,password:$("password").value});
-  if(error)throw error;
-  user=data.user;await ensureProfile();
-  $("authMsg").textContent="Signed in successfully.";
-  await loadCrops();
- }catch(e){$("authMsg").textContent=e.message;}
-}
-async function signOut(){
- const {error}=await db.auth.signOut();
- user=null;profile=null;
- $("authMsg").textContent=error?error.message:"Signed out.";
-}
-async function publishCrop(){
- try{
-  if(!user){$("cropMsg").textContent="Please sign in first.";return;}
-  if(!profile)await ensureProfile();
-  if(profile.role!=="farmer"){throw Error("Sign in with a farmer account to publish produce.");}
-  const quantity=Number($("quantity").value);
-  const rawPrice=$("price").value;
-  if(!$("crop").value.trim()||!quantity||quantity<=0)throw Error("Enter a crop name and valid quantity.");
-  const {error}=await db.from("crop_listings").insert({
-   farmer_id:user.id,crop_name:$("crop").value.trim(),
-   category:$("category").value,quantity,unit:$("unit").value,
-   county:$("cropCounty").value.trim()||profile.county,
-   price_kes:rawPrice===""?null:Number(rawPrice),
-   description:$("description").value.trim()||null
+<nav class="mobile-nav" aria-label="Mobile navigation">
+  <a href="#"><span>⌂</span>Home</a>
+  <a href="#marketplace"><span>🌾</span>Crops</a>
+  <a href="#ai-assistant"><span>✦</span>AI assistant</a>
+  <a href="#" onclick="openModal('join');return false"><span>♙</span>Account</a>
+</nav>
+
+<div class="notice" id="notice" role="status" aria-live="polite"></div>
+
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">Join HarvestChain AI</h2>
+    <p id="modalDescription" style="font-size:13px;color:#718176;line-height:1.7">Get started with our agricultural marketplace.</p>
+    <form id="appForm">
+      <div id="formFields"></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" type="button" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="submitButton" type="submit">Continue</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Supabase configuration. The anon/public key is safe for browser use when RLS is enabled.
+  const SUPABASE_URL = "https://afohekpkylngutenuryc.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as";
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const crops = [
+    {name:"Maize",category:"Grains",emoji:"🌽",description:"Grains & cereals"},
+    {name:"Rice",category:"Grains",emoji:"🌾",description:"Paddy & milled rice"},
+    {name:"Beans",category:"Grains",emoji:"🫘",description:"Legumes & pulses"},
+    {name:"Wheat",category:"Grains",emoji:"🌾",description:"Grains & cereals"},
+    {name:"Avocados",category:"Fruits",emoji:"🥑",description:"Fresh fruit"},
+    {name:"Mangoes",category:"Fruits",emoji:"🥭",description:"Fresh fruit"},
+    {name:"Bananas",category:"Fruits",emoji:"🍌",description:"Fresh fruit"},
+    {name:"Oranges",category:"Fruits",emoji:"🍊",description:"Citrus fruit"},
+    {name:"Tomatoes",category:"Vegetables",emoji:"🍅",description:"Fresh vegetables"},
+    {name:"Potatoes",category:"Vegetables",emoji:"🥔",description:"Root vegetables"},
+    {name:"Onions",category:"Vegetables",emoji:"🧅",description:"Fresh vegetables"},
+    {name:"Cabbages",category:"Vegetables",emoji:"🥬",description:"Leafy vegetables"},
+    {name:"Coffee",category:"Cash crops",emoji:"☕",description:"Coffee beans"},
+    {name:"Tea",category:"Cash crops",emoji:"🍃",description:"Tea leaves"},
+    {name:"Sugarcane",category:"Cash crops",emoji:"🎋",description:"Industrial crop"},
+    {name:"Pyrethrum",category:"Cash crops",emoji:"🌼",description:"Commercial crop"},
+    {name:"Sorghum",category:"Grains",emoji:"🌾",description:"Drought-tolerant grain"},
+    {name:"Groundnuts",category:"Grains",emoji:"🥜",description:"Oilseed & legumes"},
+    {name:"Watermelon",category:"Fruits",emoji:"🍉",description:"Fresh fruit"},
+    {name:"Carrots",category:"Vegetables",emoji:"🥕",description:"Root vegetables"},
+    {name:"Passion fruit",category:"Fruits",emoji:"🍈",description:"Fresh fruit"},
+    {name:"Macadamia",category:"Cash crops",emoji:"🌰",description:"Tree nuts"},
+    {name:"Eggs",category:"Other",emoji:"🥚",description:"Poultry produce"},
+    {name:"Other crops",category:"Other",emoji:"🌱",description:"More agricultural produce"}
+  ];
+
+  let selectedCategory = "All";
+  let liveCrops = [];
+  let currentModal = "join";
+  let selectedCrop = "";
+  let currentUser = null;
+  let currentProfile = null;
+
+  function showNotice(message) {
+    const notice = document.getElementById("notice");
+    notice.textContent = message;
+    notice.classList.add("show");
+    clearTimeout(showNotice.timer);
+    showNotice.timer = setTimeout(() => notice.classList.remove("show"), 6000);
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, ch => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[ch]));
+  }
+
+  function escapeJS(value) {
+    return String(value ?? "").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/[\r\n]/g," ");
+  }
+
+  async function ensureProfile(user, fallback = {}) {
+    if (!user) return null;
+
+    const { data: existing, error: readError } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (readError) throw readError;
+    if (existing) return existing;
+
+    const metadata = user.user_metadata || {};
+    const role = fallback.role || metadata.role || "farmer";
+    const fullName = fallback.full_name || metadata.full_name || user.email || "HarvestChain user";
+    const county = fallback.county || metadata.county || "";
+
+    const { data: profile, error } = await supabaseClient
+      .from("profiles")
+      .insert({
+        user_id: user.id,
+        full_name: fullName,
+        role: role,
+        county: county
+      })
+      .select("*")
+      .single();
+
+    if (error) throw error;
+    return profile;
+  }
+
+  async function refreshSession() {
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    currentUser = data.session?.user || null;
+    currentProfile = null;
+
+    if (currentUser) {
+      try {
+        currentProfile = await ensureProfile(currentUser);
+      } catch (err) {
+        console.error("Profile loading:", err);
+      }
+    }
+
+    updateAccountButton();
+  }
+
+  function updateAccountButton() {
+    const button = document.querySelector("header .nav > button");
+    if (!button) return;
+
+    if (currentUser) {
+      const name = currentProfile?.full_name || currentUser.email || "My account";
+      button.textContent = name.length > 16 ? name.slice(0, 16) + "…" : name;
+      button.onclick = () => openModal("account");
+    } else {
+      button.textContent = "Get started";
+      button.onclick = () => openModal("join");
+    }
+  }
+
+  async function loadLiveCrops() {
+    const { data, error } = await supabaseClient
+      .from("crop_listings")
+      .select("id,farmer_id,crop_name,category,quantity,unit,county,price_kes,description,created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Loading listings:", error);
+      showNotice("We couldn't load live listings. Check your Supabase connection and table policies.");
+      liveCrops = [];
+    } else {
+      liveCrops = (data || []).map(item => ({
+        id: item.id,
+        farmer_id: item.farmer_id,
+        name: item.crop_name,
+        category: item.category || "Other",
+        emoji: cropEmoji(item.category, item.crop_name),
+        description: [
+          item.quantity ? `${item.quantity} ${item.unit || ""}`.trim() : "",
+          item.county || "",
+          item.price_kes != null ? `KSh ${item.price_kes}` : ""
+        ].filter(Boolean).join(" · "),
+        raw: item,
+        live: true
+      }));
+    }
+
+    renderCrops();
+  }
+
+  function cropEmoji(category, name) {
+    const n = String(name || "").toLowerCase();
+    const known = {
+      maize:"🌽", rice:"🌾", beans:"🫘", wheat:"🌾", avocado:"🥑",
+      mango:"🥭", banana:"🍌", orange:"🍊", tomato:"🍅", potato:"🥔",
+      onion:"🧅", cabbage:"🥬", coffee:"☕", tea:"🍃", sugarcane:"🎋",
+      sorghum:"🌾", groundnut:"🥜", watermelon:"🍉", carrot:"🥕",
+      macadamia:"🌰", egg:"🥚"
+    };
+
+    const key = Object.keys(known).find(k => n.includes(k));
+    if (key) return known[key];
+    if (category === "Fruits") return "🍎";
+    if (category === "Vegetables") return "🥬";
+    if (category === "Grains") return "🌾";
+    return "🌱";
+  }
+
+  function renderCrops() {
+    const query = document.getElementById("searchInput").value.trim().toLowerCase();
+    const grid = document.getElementById("cropGrid");
+
+    const demoCrops = crops.map(c => ({...c, demo:true}));
+    const allCrops = [...liveCrops, ...demoCrops];
+
+    const results = allCrops.filter(c =>
+      (selectedCategory === "All" || c.category === selectedCategory) &&
+      [c.name, c.category, c.description].some(value =>
+        String(value || "").toLowerCase().includes(query)
+      )
+    );
+
+    if (!results.length) {
+      grid.innerHTML = '<div class="empty">No matching crops found. Try another search or category.</div>';
+      return;
+    }
+
+    grid.innerHTML = results.map(c => `
+      <article class="crop-card">
+        <div class="crop-emoji" aria-hidden="true">${escapeHTML(c.emoji)}</div>
+        <h3>${escapeHTML(c.name)}</h3>
+        <p>${escapeHTML(c.description || (c.demo ? "Example crop" : ""))}</p>
+        <div class="crop-meta">● ${escapeHTML(c.category)}${c.live ? " · Live listing" : " · Example"}</div>
+        <button class="btn btn-outline" onclick="${c.live
+          ? `openModal('enquiry','${escapeJS(c.name)}','${escapeJS(c.id)}')`
+          : `showNotice('This is an example crop. Sign in and select a live listing to send an enquiry.')`
+        }">${c.live ? "I'm interested" : "Example crop"}</button>
+      </article>
+    `).join("");
+  }
+
+  document.getElementById("filters").addEventListener("click", event => {
+    const button = event.target.closest("button[data-category]");
+    if (!button) return;
+    selectedCategory = button.dataset.category;
+    document.querySelectorAll(".filter").forEach(b => b.classList.toggle("active", b === button));
+    renderCrops();
   });
-  if(error)throw error;
-  $("cropMsg").textContent="Crop published!";
-  await loadCrops();
- }catch(e){$("cropMsg").textContent=e.message;}
-}
-async function loadCrops(){
- $("crops").textContent="Loading...";
- const {data,error}=await db.from("crop_listings").select("*").order("created_at",{ascending:false});
- if(error){$("crops").textContent=error.message;return;}
- $("crops").innerHTML="";
- if(!data.length){$("crops").textContent="No published crops yet.";return;}
- data.forEach(c=>{
-  const card=document.createElement("div");card.className="card";
-  const title=document.createElement("h3");title.textContent="🌾 "+c.crop_name;
-  const details=document.createElement("p");
-  details.textContent=`${c.quantity} ${c.unit||""} · ${c.county||"Kenya"}`;
-  const price=document.createElement("p");
-  price.textContent=c.price_kes==null?"Price on enquiry":`KSh ${c.price_kes} per ${c.unit||"unit"}`;
-  const btn=document.createElement("button");btn.textContent="Enquire about this crop";
-  btn.onclick=()=>{$("listingId").value=c.id;};
-  card.append(title,details,price,btn);$("crops").append(card);
- });
-}
-async function sendEnquiry(){
- try{
-  if(!user)throw Error("Please sign in first.");
-  if(!profile)await ensureProfile();
-  if(profile.role!=="buyer")throw Error("Sign in with a buyer account to enquire.");
-  const id=$("listingId").value.trim(),message=$("message").value.trim();
-  if(!id||!message)throw Error("Choose a listing and enter a message.");
-  const raw=$("requested").value;
-  const quantity=raw===""?null:Number(raw);
-  if(quantity!==null&&(!Number.isFinite(quantity)||quantity<=0))throw Error("Enter a valid quantity.");
-  const {error}=await db.from("enquiries").insert({
-   buyer_id:user.id,listing_id:id,message,quantity_requested:quantity
+
+  document.getElementById("searchInput").addEventListener("input", renderCrops);
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  function openModal(type, cropName = "", listingId = "") {
+    currentModal = type;
+    selectedCrop = cropName;
+    const backdrop = document.getElementById("modalBackdrop");
+    const title = document.getElementById("modalTitle");
+    const desc = document.getElementById("modalDescription");
+    const fields = document.getElementById("formFields");
+
+    if (type === "join") {
+      title.textContent = "Join HarvestChain AI";
+      desc.textContent = "Create an account as a farmer or buyer.";
+      fields.innerHTML = `
+        <label for="role">I am joining as</label>
+        <select id="role" name="role" required>
+          <option value="farmer">Farmer / crop supplier</option>
+          <option value="buyer">Buyer / wholesaler / business</option>
+        </select>
+        <label for="fullName">Full name</label>
+        <input id="fullName" name="fullName" required maxlength="100" autocomplete="name" placeholder="Your full name">
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@example.com">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters">
+        <label for="county">County</label>
+        <input id="county" name="county" required maxlength="80" placeholder="e.g. Kirinyaga">
+        <p style="font-size:12px;color:#718176">Already registered? <a href="#" onclick="event.preventDefault();openModal('login')" style="color:#176b43;font-weight:700">Sign in</a></p>
+      `;
+    } else if (type === "login") {
+      title.textContent = "Sign in";
+      desc.textContent = "Sign in to publish crops or contact suppliers.";
+      fields.innerHTML = `
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@example.com">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Your password">
+        <p style="font-size:12px;color:#718176">New to HarvestChain? <a href="#" onclick="event.preventDefault();openModal('join')" style="color:#176b43;font-weight:700">Create an account</a></p>
+      `;
+    } else if (type === "account") {
+      title.textContent = "Your account";
+      desc.textContent = "Manage your HarvestChain session.";
+      fields.innerHTML = `
+        <p><strong>Name:</strong> ${escapeHTML(currentProfile?.full_name || currentUser?.email || "")}</p>
+        <p><strong>Role:</strong> ${escapeHTML(currentProfile?.role || "Member")}</p>
+        <p><strong>County:</strong> ${escapeHTML(currentProfile?.county || "Not set")}</p>
+        <button type="button" class="btn btn-outline" style="width:100%" onclick="openModal('listing')">＋ List your crop</button>
+        <button type="button" class="btn btn-outline" style="width:100%;margin-top:8px" onclick="openModal('myEnquiries')">My enquiries</button>
+        <button type="button" class="btn btn-outline" style="width:100%;margin-top:8px" onclick="signOut()">Sign out</button>
+      `;
+    } else if (type === "listing") {
+      title.textContent = "List your crop";
+      desc.textContent = "Your listing will be saved to the live marketplace.";
+      fields.innerHTML = `
+        <label for="cropName">Crop name</label>
+        <input id="cropName" name="cropName" required maxlength="100" placeholder="e.g. Green grams">
+        <label for="cropCategory">Category</label>
+        <select id="cropCategory" name="cropCategory" required>
+          <option value="Grains">Grains</option>
+          <option value="Fruits">Fruits</option>
+          <option value="Vegetables">Vegetables</option>
+          <option value="Cash crops">Cash crops</option>
+          <option value="Other">Other</option>
+        </select>
+        <label for="quantity">Quantity</label>
+        <input id="quantity" name="quantity" type="number" min="0.01" step="any" required placeholder="e.g. 500">
+        <label for="unit">Unit</label>
+        <select id="unit" name="unit" required>
+          <option value="kg">Kilograms (kg)</option>
+          <option value="tonnes">Tonnes</option>
+          <option value="bags">Bags</option>
+          <option value="crates">Crates</option>
+          <option value="pieces">Pieces</option>
+        </select>
+        <label for="location">County</label>
+        <input id="location" name="location" required maxlength="80" placeholder="e.g. Kirinyaga">
+        <label for="price">Price in KSh (optional)</label>
+        <input id="price" name="price" type="number" min="0" step="0.01" placeholder="Price per unit">
+        <label for="description">Description (optional)</label>
+        <textarea id="description" name="description" maxlength="1000" placeholder="Quality, harvest date, delivery details..."></textarea>
+      `;
+    } else if (type === "enquiry") {
+      title.textContent = "Crop enquiry";
+      desc.textContent = "Send an enquiry to the farmer who posted this crop.";
+      fields.innerHTML = `
+        <input type="hidden" name="listingId" value="${escapeHTML(listingId)}">
+        <label for="enquiryCrop">Crop</label>
+        <input id="enquiryCrop" name="enquiryCrop" readonly value="${escapeHTML(cropName)}">
+        <label for="buyerQuantity">Quantity needed</label>
+        <input id="buyerQuantity" name="buyerQuantity" maxlength="80" placeholder="e.g. 2 tonnes">
+        <label for="message">Message to farmer</label>
+        <textarea id="message" name="message" required maxlength="1500" placeholder="Tell the farmer what you need..."></textarea>
+      `;
+    } else if (type === "myEnquiries") {
+      title.textContent = "My enquiries";
+      desc.textContent = "Your enquiries saved in HarvestChain.";
+      fields.innerHTML = `<div id="enquiriesResults">Loading enquiries…</div>`;
+      setTimeout(loadMyEnquiries, 0);
+    }
+
+    backdrop.classList.add("show");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    document.getElementById("modalBackdrop").classList.remove("show");
+    document.body.style.overflow = "";
+  }
+
+  async function loadMyEnquiries() {
+    const target = document.getElementById("enquiriesResults");
+    if (!target) return;
+    if (!currentUser) {
+      target.textContent = "Please sign in to view enquiries.";
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("enquiries")
+      .select("id,message,quantity_requested,created_at,listing_id")
+      .eq("buyer_id", currentUser.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      target.textContent = "Could not load enquiries. Please try again.";
+      console.error(error);
+      return;
+    }
+
+    if (!data.length) {
+      target.textContent = "You have not sent any enquiries yet.";
+      return;
+    }
+
+    target.innerHTML = data.map(item => `
+      <article style="border:1px solid #e4eae3;border-radius:12px;padding:12px;margin:10px 0">
+        <strong>${escapeHTML(item.quantity_requested || "Quantity not specified")}</strong>
+        <p>${escapeHTML(item.message)}</p>
+        <small style="color:#718176">${escapeHTML(new Date(item.created_at).toLocaleDateString())}</small>
+      </article>
+    `).join("");
+  }
+
+  async function signOut() {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+      showNotice("Sign out failed: " + error.message);
+      return;
+    }
+
+    currentUser = null;
+    currentProfile = null;
+    updateAccountButton();
+    closeModal();
+    showNotice("You have signed out.");
+  }
+
+  document.getElementById("appForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const submitButton = document.getElementById("submitButton");
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Please wait…";
+
+    try {
+      if (currentModal === "join") {
+        const { data: result, error } = await supabaseClient.auth.signUp({
+          email: data.email.trim(),
+          password: data.password,
+          options: {
+            data: {
+              full_name: data.fullName.trim(),
+              role: data.role,
+              county: data.county.trim()
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        if (result.session && result.user) {
+          currentUser = result.user;
+          currentProfile = await ensureProfile(result.user, {
+            full_name: data.fullName.trim(),
+            role: data.role,
+            county: data.county.trim()
+          });
+          updateAccountButton();
+          closeModal();
+          form.reset();
+          showNotice("Welcome to HarvestChain AI, " + data.fullName + "! Your account is ready.");
+        } else {
+          closeModal();
+          form.reset();
+          showNotice("Registration received. Check your email to confirm your account, then sign in.");
+        }
+        return;
+      }
+
+      if (currentModal === "login") {
+        const { data: result, error } = await supabaseClient.auth.signInWithPassword({
+          email: data.email.trim(),
+          password: data.password
+        });
+
+        if (error) throw error;
+
+        currentUser = result.user;
+        currentProfile = await ensureProfile(result.user);
+        updateAccountButton();
+        closeModal();
+        form.reset();
+        showNotice("Welcome back to HarvestChain AI!");
+        return;
+      }
+
+      if (currentModal === "listing") {
+        if (!currentUser) {
+          openModal("login");
+          showNotice("Please sign in before listing a crop.");
+          return;
+        }
+
+        if (currentProfile?.role !== "farmer") {
+          showNotice("Only farmer accounts can publish crop listings.");
+          return;
+        }
+
+        const { error } = await supabaseClient.from("crop_listings").insert({
+          farmer_id: currentUser.id,
+          crop_name: data.cropName.trim(),
+          category: data.cropCategory,
+          quantity: Number(data.quantity),
+          unit: data.unit,
+          county: data.location.trim(),
+          price_kes: data.price === "" ? null : Number(data.price),
+          description: data.description.trim()
+        });
+
+        if (error) throw error;
+
+        closeModal();
+        form.reset();
+        await loadLiveCrops();
+        document.getElementById("marketplace").scrollIntoView({behavior:"smooth"});
+        showNotice("Your crop listing has been published to the marketplace.");
+        return;
+      }
+
+      if (currentModal === "enquiry") {
+        if (!currentUser) {
+          openModal("login");
+          showNotice("Please sign in as a buyer to send an enquiry.");
+          return;
+        }
+
+        if (currentProfile?.role !== "buyer") {
+          showNotice("Please use a buyer account to send crop enquiries.");
+          return;
+        }
+
+        const { error } = await supabaseClient.from("enquiries").insert({
+          buyer_id: currentUser.id,
+          listing_id: data.listingId,
+          message: data.message.trim(),
+          quantity_requested: data.buyerQuantity.trim() || null
+        });
+
+        if (error) throw error;
+
+        closeModal();
+        form.reset();
+        showNotice("Your enquiry was sent to the farmer.");
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      showNotice(error.message || "Something went wrong. Please try again.");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Continue";
+    }
   });
-  if(error)throw error;
-  $("enquiryMsg").textContent="Enquiry sent successfully.";
- }catch(e){$("enquiryMsg").textContent=e.message;}
-}
-db.auth.onAuthStateChange((_event,s)=>{user=s?.user||null;});
-session().catch(e=>console.error(e));
-loadCrops();
+
+  function askAI() {
+    const topic = document.getElementById("aiTopic").value;
+    const crop = document.getElementById("aiCrop").value.trim() || "your crop";
+    const guidance = {
+      buyers: "Prepare your crop name, quantity, quality, harvest date and location. Contact local aggregators, millers, wholesalers and institutional buyers. Verify the buyer and agree on payment and delivery terms in writing.",
+      prices: "Compare recent prices from several local markets, cooperatives and buyers. Confirm the crop grade, unit, transport costs and date. No live prices are connected yet.",
+      planning: "Estimate your harvest date and expected quantity. Arrange storage and transport early, check buyer quality requirements and avoid promising quantities you cannot supply.",
+      business: "Record your production costs, expected quantity and selling price. Compare buyer offers after transport and handling costs, then build relationships with repeat customers."
+    };
+    showNotice("HarvestChain AI guidance for " + crop + ": " + guidance[topic] + " This is general guidance, not a live AI-generated forecast.");
+  }
+
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
+    currentUser = session?.user || null;
+    updateAccountButton();
+  });
+
+  renderCrops();
+  refreshSession();
+  loadLiveCrops();
 </script>
 </body>
 </html>
