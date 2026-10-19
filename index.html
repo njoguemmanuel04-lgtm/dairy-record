@@ -1,37 +1,180 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#176b43">
-  <title>HarvestChain AI | Kenya's Smart Agriculture Marketplace</title>
-  <!-- ONLY ADDITION 1: Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.4/dist/umd/supabase.min.js"></script>
-  <style>/* YOUR ORIGINAL CSS - 100% SAME - NOT CHANGED */</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HarvestChain AI</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{margin:0;font:16px Arial;background:#f3f8f3;color:#173b28}
+header{background:#124b30;color:white;padding:20px}
+main{max-width:850px;margin:auto;padding:20px}
+section{background:white;padding:20px;border-radius:14px;margin:15px 0}
+input,select,textarea,button{box-sizing:border-box;width:100%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #ccc}
+button{background:#176b45;color:white;border:0;font-weight:bold}
+.card{border:1px solid #ddd;padding:15px;border-radius:10px;margin:10px 0}
+small{color:#53685a}
+</style>
 </head>
 <body>
-<!-- YOUR ORIGINAL BODY - 100% SAME - NOT CHANGED -->
-<!-- ... header, hero, marketplace, features, AI, how-it-works, footer, mobile-nav, notice, modal ... -->
+<header>
+<h1>🌱 HarvestChain AI</h1>
+<p>Connecting farmers and buyers across Kenya</p>
+<button onclick="signOut()">Sign out</button>
+</header>
+
+<main>
+<section>
+<h2>Create account / Sign in</h2>
+<input id="name" placeholder="Full name (registration only)">
+<input id="email" type="email" placeholder="Email" required>
+<input id="password" type="password" placeholder="Password (minimum 8 characters)" required>
+<select id="role"><option value="farmer">Farmer</option><option value="buyer">Buyer</option></select>
+<input id="county" placeholder="County">
+<button onclick="register()">Register</button>
+<button onclick="login()">Sign in</button>
+<p id="authMsg"></p>
+</section>
+
+<section>
+<h2>🌽 Publish crop listing</h2>
+<input id="crop" placeholder="Crop name">
+<select id="category">
+<option>Cereals</option><option>Fruits</option><option>Vegetables</option>
+<option>Legumes</option><option>Other</option>
+</select>
+<input id="quantity" type="number" min="0.01" placeholder="Quantity">
+<select id="unit"><option>kg</option><option>tonnes</option><option>bags</option><option>crates</option></select>
+<input id="price" type="number" min="0" placeholder="Price in KSh per unit (optional)">
+<input id="cropCounty" placeholder="County">
+<textarea id="description" placeholder="Description (optional)"></textarea>
+<button onclick="publishCrop()">Publish produce</button>
+<p id="cropMsg"></p>
+</section>
+
+<section>
+<h2>🛒 Available produce</h2>
+<button onclick="loadCrops()">Refresh listings</button>
+<div id="crops">Loading listings...</div>
+</section>
+
+<section>
+<h2>✉️ Buyer enquiry</h2>
+<input id="listingId" placeholder="Listing ID">
+<input id="requested" type="number" min="0.01" placeholder="Quantity needed (optional)">
+<textarea id="message" placeholder="Message to farmer"></textarea>
+<button onclick="sendEnquiry()">Send enquiry</button>
+<p id="enquiryMsg"></p>
+</section>
+</main>
 
 <script>
-  // ONLY ADDITION 2: YOUR CLOUD CREDENTIALS
-  const SUPABASE_URL = 'https://afohakpkylngutenuryc.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as';
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const URL="https://afohekpkylngutenuryc.supabase.co";
+const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as";
+const db=window.supabase.createClient(URL,KEY);
+const $=id=>document.getElementById(id);
+let user=null,profile=null;
 
-  // YOUR ORIGINAL crops array - SAME
-  const crops = [/* your 24 crops */];
-
-  // YOUR ORIGINAL functions - SAME, but fetchCloudCrops added
-  async function fetchCloudCrops(){ /* loads from Supabase */ }
-  
-  // YOUR ORIGINAL renderCrops - SAME, now includes cloud crops
-  // YOUR ORIGINAL openModal, closeModal, askAI - SAME
-  
-  // ONLY ADDITION 3: In form submit, also save to Supabase
-  // listing -> supabaseClient.from('crops').insert([payload])
-  // join -> supabaseClient.auth.signUp({email, password})
-  // enquiry -> supabaseClient.from('enquiries').insert([payload])
+async function session(){
+ const {data}=await db.auth.getSession();
+ user=data.session?.user||null;
+ if(user) await ensureProfile();
+}
+async function ensureProfile(){
+ const {data,error}=await db.from("profiles").select("*").eq("user_id",user.id).maybeSingle();
+ if(error) throw error;
+ if(data){profile=data;return;}
+ const m=user.user_metadata||{};
+ const {data:created,error:e}=await db.from("profiles").insert({
+  user_id:user.id,full_name:m.full_name||user.email,
+  role:m.role||"buyer",county:m.county||null
+ }).select().single();
+ if(e) throw e;
+ profile=created;
+}
+async function register(){
+ try{
+  const {data,error}=await db.auth.signUp({email:$("email").value,password:$("password").value,
+   options:{data:{full_name:$("name").value.trim(),role:$("role").value,county:$("county").value.trim()}}});
+  if(error)throw error;
+  user=data.user;
+  if(data.session){await ensureProfile();$("authMsg").textContent="Account created and signed in.";}
+  else $("authMsg").textContent="Check your email to confirm your account, then sign in.";
+ }catch(e){$("authMsg").textContent=e.message;}
+}
+async function login(){
+ try{
+  const {data,error}=await db.auth.signInWithPassword({email:$("email").value,password:$("password").value});
+  if(error)throw error;
+  user=data.user;await ensureProfile();
+  $("authMsg").textContent="Signed in successfully.";
+  await loadCrops();
+ }catch(e){$("authMsg").textContent=e.message;}
+}
+async function signOut(){
+ const {error}=await db.auth.signOut();
+ user=null;profile=null;
+ $("authMsg").textContent=error?error.message:"Signed out.";
+}
+async function publishCrop(){
+ try{
+  if(!user){$("cropMsg").textContent="Please sign in first.";return;}
+  if(!profile)await ensureProfile();
+  if(profile.role!=="farmer"){throw Error("Sign in with a farmer account to publish produce.");}
+  const quantity=Number($("quantity").value);
+  const rawPrice=$("price").value;
+  if(!$("crop").value.trim()||!quantity||quantity<=0)throw Error("Enter a crop name and valid quantity.");
+  const {error}=await db.from("crop_listings").insert({
+   farmer_id:user.id,crop_name:$("crop").value.trim(),
+   category:$("category").value,quantity,unit:$("unit").value,
+   county:$("cropCounty").value.trim()||profile.county,
+   price_kes:rawPrice===""?null:Number(rawPrice),
+   description:$("description").value.trim()||null
+  });
+  if(error)throw error;
+  $("cropMsg").textContent="Crop published!";
+  await loadCrops();
+ }catch(e){$("cropMsg").textContent=e.message;}
+}
+async function loadCrops(){
+ $("crops").textContent="Loading...";
+ const {data,error}=await db.from("crop_listings").select("*").order("created_at",{ascending:false});
+ if(error){$("crops").textContent=error.message;return;}
+ $("crops").innerHTML="";
+ if(!data.length){$("crops").textContent="No published crops yet.";return;}
+ data.forEach(c=>{
+  const card=document.createElement("div");card.className="card";
+  const title=document.createElement("h3");title.textContent="🌾 "+c.crop_name;
+  const details=document.createElement("p");
+  details.textContent=`${c.quantity} ${c.unit||""} · ${c.county||"Kenya"}`;
+  const price=document.createElement("p");
+  price.textContent=c.price_kes==null?"Price on enquiry":`KSh ${c.price_kes} per ${c.unit||"unit"}`;
+  const btn=document.createElement("button");btn.textContent="Enquire about this crop";
+  btn.onclick=()=>{$("listingId").value=c.id;};
+  card.append(title,details,price,btn);$("crops").append(card);
+ });
+}
+async function sendEnquiry(){
+ try{
+  if(!user)throw Error("Please sign in first.");
+  if(!profile)await ensureProfile();
+  if(profile.role!=="buyer")throw Error("Sign in with a buyer account to enquire.");
+  const id=$("listingId").value.trim(),message=$("message").value.trim();
+  if(!id||!message)throw Error("Choose a listing and enter a message.");
+  const raw=$("requested").value;
+  const quantity=raw===""?null:Number(raw);
+  if(quantity!==null&&(!Number.isFinite(quantity)||quantity<=0))throw Error("Enter a valid quantity.");
+  const {error}=await db.from("enquiries").insert({
+   buyer_id:user.id,listing_id:id,message,quantity_requested:quantity
+  });
+  if(error)throw error;
+  $("enquiryMsg").textContent="Enquiry sent successfully.";
+ }catch(e){$("enquiryMsg").textContent=e.message;}
+}
+db.auth.onAuthStateChange((_event,s)=>{user=s?.user||null;});
+session().catch(e=>console.error(e));
+loadCrops();
 </script>
 </body>
 </html>
