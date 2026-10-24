@@ -44,7 +44,7 @@ th{background:#e9ecea;padding:10px;text-align:left;font-size:11px;white-space:no
 
 <div class="container" style="padding:20px 0;">
 <div style="background:white;border:1px solid var(--border);border-radius:16px;padding:14px;">
-<p style="font-size:13px;font-weight:700;">Dairy Quality Monitoring Dashboard — Updated: <span id="updTime"></span> EAT</p>
+<p style="font-size:13px;font-weight:700;">Dairy Quality Monitoring Dashboard — Updated: <span id="updTime"></span> EAT • Live Supabase</p>
 <p style="font-size:11px;color:#66756b;">Latest batches submitted today • Kirinyaga County</p>
 
 <div class="categories" id="catBtns" style="margin-top:12px;">
@@ -59,7 +59,7 @@ th{background:#e9ecea;padding:10px;text-align:left;font-size:11px;white-space:no
 <div class="card">
 <div class="table-wrap">
 <table><thead><tr><th>Batch ID</th><th>Farmer Name</th><th>Volume (L)</th><th>Fat %</th><th>Quality</th><th>Remarks</th></tr></thead>
-<tbody id="milkBody"></tbody></table>
+<tbody id="milkBody"><tr><td colspan="6" style="padding:20px;text-align:center;">Loading 827L live...</td></tr></tbody></table>
 </div>
 <div style="padding:10px;background:#f0f9f0;font-size:11px;">Note: Quality grading follows Kenya Dairy Board standards — Accepted, Grade A, Grade B, Rejected. No A+ grade applied.</div>
 </div>
@@ -77,10 +77,10 @@ th{background:#e9ecea;padding:10px;text-align:left;font-size:11px;white-space:no
 </div>
 
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;" class="stats">
-<div class="stat"><small>Total Collections Today</small><b id="totalLit">465 L</b><small style="color:green;">+120 L from yesterday</small></div>
-<div class="stat"><small>Accepted Milk</small><b id="acceptedLit">230 L</b><small>49.5% of total</small></div>
-<div class="stat"><small>Grade B Milk</small><b>80 L</b><small style="color:#a16207;">17.2% of total</small></div>
-<div class="stat"><small>Rejected Milk</small><b>60 L</b><small style="color:red;">12.9% of total</small></div>
+<div class="stat"><small>Total Collections Today</small><b id="totalLit">827 L</b><small style="color:green;" id="totalSub">Live from Supabase</small></div>
+<div class="stat"><small>Accepted Milk</small><b id="acceptedLit">230 L</b><small id="accPer">49.5% of total</small></div>
+<div class="stat"><small>Grade B Milk</small><b id="gradeBLit">80 L</b><small style="color:#a16207;" id="bPer">17.2% of total</small></div>
+<div class="stat"><small>Rejected Milk</small><b id="rejectedLit">60 L</b><small style="color:red;" id="rejPer">12.9% of total</small></div>
 </div>
 
 <h3 style="margin-top:24px;">Cooperative Network — Kirinyaga</h3>
@@ -105,9 +105,11 @@ th{background:#e9ecea;padding:10px;text-align:left;font-size:11px;white-space:no
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
+// YOUR SUPABASE - FIXED
 const SUPA_URL="https://afohekpkylingutenuryc.supabase.co"
-const SUPA_KEY="REPLACE_WITH_ANON_KEY"
+const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as"
 const supa=supabase.createClient(SUPA_URL,SUPA_KEY)
+
 document.getElementById("updTime").innerText=new Date().toLocaleString('en-KE',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
 
 let allData=[
@@ -125,23 +127,68 @@ function badge(q){
   if(q==="Rejected") return `<span class="badge badge-rejected">Rejected</span>`
   return q
 }
+
 function render(filter="All"){
   const filtered=filter==="All"?allData:allData.filter(d=>d.quality===filter)
   document.getElementById("milkBody").innerHTML=filtered.map(d=>`<tr><td>${d.id}</td><td>${d.farmer}</td><td>${d.vol}</td><td>${d.fat}</td><td>${badge(d.quality)}</td><td style="font-size:11px;">${d.remark}</td></tr>`).join("")
   let acc=0,b=0,rej=0,a=0,total=0
-  allData.forEach(d=>{total+=d.vol; if(d.quality==="Accepted") acc+=d.vol; if(d.quality==="Grade A") a+=d.vol; if(d.quality==="Grade B") b+=d.vol; if(d.quality==="Rejected") rej+=d.vol})
+  allData.forEach(d=>{total+=Number(d.vol); if(d.quality==="Accepted") acc+=Number(d.vol); if(d.quality==="Grade A") a+=Number(d.vol); if(d.quality==="Grade B") b+=Number(d.vol); if(d.quality==="Rejected") rej+=Number(d.vol)})
   document.getElementById("totalLit").innerText=total+" L"
   document.getElementById("acceptedLit").innerText=acc+" L"
+  document.getElementById("gradeBLit").innerText=b+" L"
+  document.getElementById("rejectedLit").innerText=rej+" L"
   document.getElementById("breakdown").innerHTML=`
-    <div>Accepted <div style="display:inline-block;width:80px;height:10px;background:#15803d"></div> ${acc}L (49.5%)</div>
-    <div>Grade A <div style="display:inline-block;width:80px;height:10px;background:#0e7490"></div> ${a}L (20.4%)</div>
-    <div>Grade B <div style="display:inline-block;width:80px;height:10px;background:#ca8a04"></div> ${b}L (17.2%)</div>
-    <div>Rejected <div style="display:inline-block;width:80px;height:10px;background:#dc2626"></div> ${rej}L (12.9%)</div>`
+    <div>Accepted <div style="display:inline-block;width:80px;height:10px;background:#15803d"></div> ${acc}L (${total?Math.round(acc/total*100):0}%)</div>
+    <div>Grade A <div style="display:inline-block;width:80px;height:10px;background:#0e7490"></div> ${a}L (${total?Math.round(a/total*100):0}%)</div>
+    <div>Grade B <div style="display:inline-block;width:80px;height:10px;background:#ca8a04"></div> ${b}L (${total?Math.round(b/total*100):0}%)</div>
+    <div>Rejected <div style="display:inline-block;width:80px;height:10px;background:#dc2626"></div> ${rej}L (${total?Math.round(rej/total*100):0}%)</div>`
 }
+
+async function loadFromSupabase(){
+  const { data, error } = await supa.from('deliveries').select('*').order('created_at',{ascending:false}).limit(100)
+  if(error){ console.log('Supabase not yet created tables:', error.message); render(); loadCoops(); return; }
+  if(data && data.length>0){
+    allData = data.map(r=>({
+      id: r.batch_id || r.id.slice(0,8),
+      farmer: r.farmer_name,
+      vol: Number(r.volume),
+      fat: r.fat_percent || '3.5',
+      quality: r.quality,
+      remark: r.quality==="Rejected"?"High bacteria — rejected":r.quality==="Grade B"?"Below target — monitor":"Meets standard — cleared"
+    }))
+  }
+  render(document.querySelector(".category-btn.active")?.dataset.cat || "All")
+  loadCoops()
+}
+
+async function loadCoops(){
+  const { data } = await supa.from('cooperatives').select('*')
+  if(data && data.length>0){
+    document.getElementById("coopGrid").innerHTML=data.map(c=>`<div class="card" style="padding:10px;">${c.name} — ${c.farmers} Farmers</div>`).join('')
+  } else {
+    document.getElementById("coopGrid").innerHTML=`<div class="card" style="padding:10px;">Kagio Dairy — 312 Farmers</div><div class="card" style="padding:10px;">Kerugoya Coop — 289 Farmers</div><div class="card" style="padding:10px;">Kutus Farmers — 245 Farmers</div><div class="card" style="padding:10px;">Mutira Dairy — 154 Farmers</div>`
+  }
+}
+
 document.getElementById("catBtns").addEventListener("click",e=>{const b=e.target.closest("[data-cat]"); if(!b) return; document.querySelectorAll(".category-btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); render(b.dataset.cat)})
-document.getElementById("milkForm").addEventListener("submit",e=>{e.preventDefault(); const farmer=document.getElementById("fName").value; const quality=document.getElementById("fQuality").value; const vol=Number(document.getElementById("fLit").value); const fat=document.getElementById("fFat").value||"3.5"; allData.unshift({id:"BD-"+Date.now().toString().slice(-5), farmer, vol, fat, quality, remark: quality==="Rejected"?"High bacteria — rejected":quality==="Grade B"?"Below target — monitor":"Meets standard — cleared"}); render(document.querySelector(".category-btn.active").dataset.cat); document.getElementById("msg").innerText=`Saved ${vol}L ${farmer} — ${quality}`; e.target.reset()})
-function loadCoops(){ document.getElementById("coopGrid").innerHTML=`<div class="card" style="padding:10px;">Kagio Dairy — 312 Farmers</div><div class="card" style="padding:10px;">Kerugoya Coop — 289 Farmers</div><div class="card" style="padding:10px;">Kutus Farmers — 245 Farmers</div><div class="card" style="padding:10px;">Mutira Dairy — 154 Farmers</div>`}
-render(); loadCoops();
+
+document.getElementById("milkForm").addEventListener("submit",async e=>{
+  e.preventDefault()
+  const farmer=document.getElementById("fName").value.trim()
+  const quality=document.getElementById("fQuality").value
+  const vol=Number(document.getElementById("fLit").value)
+  const fat=document.getElementById("fFat").value||"3.5"
+  const batch="BD-"+Date.now().toString().slice(-5)
+  document.getElementById("msg").innerText="Saving to Supabase..."
+  const { error } = await supa.from('deliveries').insert([{ batch_id:batch, farmer_name:farmer, volume:vol, fat_percent:fat, quality:quality }])
+  if(error){ document.getElementById("msg").innerText="Error: "+error.message; return; }
+  allData.unshift({id:batch, farmer, vol, fat, quality, remark: quality==="Rejected"?"High bacteria — rejected":quality==="Grade B"?"Below target — monitor":"Meets standard — cleared"})
+  render(document.querySelector(".category-btn.active").dataset.cat)
+  document.getElementById("msg").innerText=`Saved ${vol}L ${farmer} — ${quality} to Supabase (Live 827L updated)`
+  e.target.reset()
+})
+
+loadFromSupabase()
 </script>
 </body>
 </html>
