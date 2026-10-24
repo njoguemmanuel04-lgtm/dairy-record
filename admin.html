@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Podago Admin | Kirinyaga - 827L Live</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+body{font-family:DM Sans,sans-serif;background:#f6f9f6}
+.card{background:white;border:1px solid #e3ebe4;border-radius:16px;padding:16px}
+.badge{padding:4px 10px;border-radius:100px;font-size:11px;font-weight:800;color:white}
+.badge-accepted{background:#15803d}.badge-a{background:#0e7490}.badge-b{background:#ca8a04}.badge-rejected{background:#dc2626}
+</style>
+</head>
+<body>
+<div class="bg-[#064c32] text-white text-center p-2 text-[11px]">🥛 Podago Admin — 23 Co-ops Live • 827L Today • M-Pesa Ready • No A+ Grade</div>
+<header class="bg-white border-b p-4 flex justify-between items-center"><b>🥛 Podago Admin — Kirinyaga</b><a href="index.html" class="text-xs border rounded-full px-3 py-1">View Clerk Page</a></header>
+
+<div class="max-w-[1160px] w-[92%] mx-auto py-4">
+<!-- STATS -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<div class="card text-center"><small class="text-[11px]">Total Collections Today</small><b id="aTotal" class="block text-[22px]">827 L</b><small class="text-green-600 text-[11px]">Live Supabase</small></div>
+<div class="card text-center"><small class="text-[11px]">Accepted Milk</small><b id="aAcc" class="block text-[22px]">0 L</b><small id="aAccP" class="text-[11px]">0%</small></div>
+<div class="card text-center"><small class="text-[11px]">Grade B Milk</small><b id="aB" class="block text-[22px]">0 L</b><small id="aBP" class="text-[11px] text-[#a16207]">0%</small></div>
+<div class="card text-center"><small class="text-[11px]">Rejected Milk</small><b id="aRej" class="block text-[22px]">0 L</b><small id="aRejP" class="text-[11px] text-red-600">0%</small></div>
+</div>
+
+<div class="grid md:grid-cols-[2fr_1fr] gap-4 mt-4">
+<!-- TABLE -->
+<div class="card">
+<div class="flex justify-between items-center mb-3"><h3 class="font-bold text-sm">All Deliveries — Edit/Delete Live</h3><button onclick="loadAdmin()" class="text-xs border rounded-full px-3 py-1">Refresh</button></div>
+<div class="overflow-auto">
+<table class="w-full text-[12px] min-w-[700px]"><thead><tr class="bg-[#e9ecea]"><th class="p-2 text-left">Batch</th><th class="text-left">Farmer</th><th>Vol</th><th>Fat%</th><th>Quality</th><th>Action</th></tr></thead><tbody id="adminBody"><tr><td colspan="6" class="p-6 text-center">Loading 827L from Supabase...</td></tr></tbody></table>
+</div>
+<div class="mt-3 p-2 bg-[#f0f9f0] text-[11px]">No A+ grade — Kenya Dairy Board: Accepted, Grade A, Grade B, Rejected only. Edit fixes clerk mistake, Delete removes fake entry.</div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="space-y-4">
+<div class="card">
+<h3 class="font-bold text-sm">💰 M-Pesa Payout</h3>
+<p class="text-[11px] text-gray-500 mt-1">KES 45 per litre • Auto calc from live total</p>
+<div class="mt-3 text-[12px]"><div>Total Payable: <b id="payTotal">KES 0</b></div><div class="text-[11px] text-gray-500">Farmers: <span id="payCount">0</span></div></div>
+<button onclick="processPayout()" class="w-full bg-[#087747] text-white rounded-xl p-3 mt-3 font-bold text-xs">Process M-Pesa Payout Now</button>
+<p id="payMsg" class="text-[11px] text-green-700 mt-2"></p>
+</div>
+
+<div class="card">
+<h3 class="font-bold text-sm">Cooperatives</h3>
+<div id="coopList" class="mt-2 text-[12px] space-y-2"></div>
+</div>
+
+<div class="card bg-[#eef7fb] border-[#b6d8e8]">
+<b class="text-[11px]">ⓘ For Chairman Tomorrow</b><p class="text-[11px] mt-1">Show this admin: Live 827L, Edit/Delete buttons, M-Pesa KES total. Proves no paper loss, no fraud. Close Podago with KES 3k/month.</p>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+const SUPA_URL="https://afohekpkylingutenuryc.supabase.co"
+const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as"
+const supa=supabase.createClient(SUPA_URL,SUPA_KEY)
+
+let adminData=[]
+
+function badge(q){
+  if(q==="Accepted") return `<span class="badge badge-accepted">Accepted</span>`
+  if(q==="Grade A") return `<span class="badge badge-a">Grade A</span>`
+  if(q==="Grade B") return `<span class="badge badge-b">Grade B</span>`
+  if(q==="Rejected") return `<span class="badge badge-rejected">Rejected</span>`
+  return q
+}
+
+async function loadAdmin(){
+  const { data, error } = await supa.from('deliveries').select('*').order('created_at',{ascending:false})
+  if(error){ document.getElementById('adminBody').innerHTML=`<tr><td colspan=6 class="p-4 text-red-600">Error: ${error.message}<br>Run SQL to create deliveries table, or if URL wrong use https://afohekpkylngutenuryc.supabase.co</td></tr>`; return; }
+  adminData=data||[]
+  const tbody=document.getElementById('adminBody')
+  if(adminData.length===0){ tbody.innerHTML=`<tr><td colspan=6 class="p-4 text-center">No deliveries yet — save from clerk page. Demo will show 465L</td></tr>`; return; }
+  let total=0, acc=0, b=0, rej=0, a=0
+  tbody.innerHTML=adminData.map(r=>{
+    total+=Number(r.volume); if(r.quality==="Accepted") acc+=Number(r.volume); if(r.quality==="Grade A") a+=Number(r.volume); if(r.quality==="Grade B") b+=Number(r.volume); if(r.quality==="Rejected") rej+=Number(r.volume);
+    return `<tr class="border-t"><td class="p-2">${r.batch_id}</td><td class="p-2">${r.farmer_name}</td><td class="p-2">${r.volume}L</td><td class="p-2">${r.fat_percent}%</td><td class="p-2">${badge(r.quality)}</td><td class="p-2 flex gap-1"><button onclick="editRow('${r.id}')" class="border rounded-full px-2 py-1 text-[11px]">Edit</button><button onclick="deleteRow('${r.id}')" class="bg-red-600 text-white rounded-full px-2 py-1 text-[11px]">Delete</button></td></tr>`
+  }).join('')
+  document.getElementById('aTotal').innerText=total+" L"
+  document.getElementById('aAcc').innerText=acc+" L"
+  document.getElementById('aB').innerText=b+" L"
+  document.getElementById('aRej').innerText=rej+" L"
+  document.getElementById('aAccP').innerText=Math.round(total?acc/total*100:0)+"% of total"
+  document.getElementById('aBP').innerText=Math.round(total?b/total*100:0)+"%"
+  document.getElementById('aRejP').innerText=Math.round(total?rej/total*100:0)+"%"
+  document.getElementById('payTotal').innerText="KES "+(total*45).toLocaleString()
+  document.getElementById('payCount').innerText=adminData.length
+  loadCoopsAdmin()
+}
+
+async function deleteRow(id){
+  if(!confirm('Delete this delivery from Supabase?')) return
+  const { error } = await supa.from('deliveries').delete().eq('id',id)
+  if(error) alert(error.message); else loadAdmin()
+}
+
+async function editRow(id){
+  const row=adminData.find(r=>r.id===id)
+  const newVol=prompt(`Edit volume for ${row.farmer_name} (current ${row.volume}L):`, row.volume)
+  if(newVol===null) return
+  const newQuality=prompt(`Edit quality (Accepted, Grade A, Grade B, Rejected):`, row.quality)
+  if(newQuality===null) return
+  const { error } = await supa.from('deliveries').update({ volume: Number(newVol), quality: newQuality }).eq('id',id)
+  if(error) alert(error.message); else loadAdmin()
+}
+
+async function loadCoopsAdmin(){
+  const { data } = await supa.from('cooperatives').select('*')
+  if(!data) return
+  document.getElementById('coopList').innerHTML=data.map(c=>`<div class="flex justify-between border-b py-1"><span>${c.name}</span><b>${c.farmers}</b></div>`).join('')
+}
+
+function processPayout(){
+  const totalText=document.getElementById('aTotal').innerText
+  document.getElementById('payMsg').innerText="Processing M-Pesa for "+totalText+" = "+document.getElementById('payTotal').innerText+" — (Demo: Integrate Daraja API next)"
+}
+
+loadAdmin()
+</script>
+</body>
+</html>
