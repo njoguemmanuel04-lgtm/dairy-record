@@ -1,203 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#075c38">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dairy Record | Podago Dairy - Kirinyaga</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--green:#087747;--green-dark:#064c32;--bg:#f6f9f6;--border:#e3ebe4;--shadow:0 12px 35px rgba(13,63,36,.08);}
-*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"DM Sans",sans-serif;background:var(--bg);color:#17251c;}
-.container{width:min(1160px,92%);margin:auto;}
-header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
-.nav{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.brand{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:800;color:var(--green-dark);}
-.brand-icon{width:38px;height:38px;display:grid;place-items:center;background:#e8f8e9;border-radius:12px;}
-.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;}
-.btn-primary{background:var(--green);color:white;}.btn-outline{background:white;border:1px solid var(--border);}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px;}
-.stat{background:white;border:1px solid var(--border);border-radius:16px;padding:14px;text-align:center;box-shadow:var(--shadow);}
-.stat b{font-size:24px;display:block;}
-.categories{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
-.category-btn{border:1px solid var(--border);background:white;border-radius:100px;padding:8px 14px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;flex-shrink:0;}
-.category-btn.active{background:var(--green);color:white;border-color:var(--green);}
-.card{background:white;border:1px solid var(--border);border-radius:16px;overflow:hidden;}
-.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-table{width:100%;min-width:620px;border-collapse:collapse;font-size:13px;}
-th{background:#e9ecea;padding:10px;text-align:left;font-size:11px;white-space:nowrap;}td{padding:12px 10px;border-top:1px solid var(--border);vertical-align:middle;}
-.badge{padding:5px 10px;border-radius:100px;font-size:11px;font-weight:800;color:white;display:inline-block;white-space:nowrap;}
-.badge-accepted{background:#15803d;}.badge-a{background:#0e7490;}.badge-b{background:#ca8a04;}.badge-rejected{background:#dc2626;}
-.live-grid{display:grid;grid-template-columns:1.6fr .8fr;gap:16px;}
-@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr);}.live-grid{grid-template-columns:1fr;}}
+:root{--green:#087747;--green-dark:#064c32;--bg:#f6f9f6;--border:#e3ebe4}
+body{font-family:"DM Sans",sans-serif;background:var(--bg)}
+.container{width:min(1160px,92%);margin:auto}
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--green-dark)}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.badge{padding:5px 10px;border-radius:100px;font-size:11px;font-weight:800;color:#fff}
+.badge-accepted{background:#15803d}.badge-a{background:#0e7490}.badge-b{background:#ca8a04}.badge-rejected{background:#dc2626}
+.category-btn{border:1px solid var(--border);background:#fff;border-radius:100px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer}
+.category-btn.active{background:var(--green);color:#fff}
 </style>
 </head>
 <body>
-
-<div style="background:#064c32;color:white;text-align:center;padding:8px;font-size:11px;">🥛 Podago Dairy Live — 23 Co-ops • M-Pesa • Kenya Dairy Board Compliant • No A+ Grade</div>
-
-<header><div class="container nav">
-<a class="brand"><span class="brand-icon">🥛</span><span>Podago Dairy Cooperative<br><small style="font-size:9px;color:#66756b;letter-spacing:1px;">KIRINYAGA, KENYA</small></span></a>
-<div style="font-size:12px;font-weight:700;">QC Officer | Logout</div>
-</div></header>
-
-<div class="container" style="padding:20px 0;">
-<div style="background:white;border:1px solid var(--border);border-radius:16px;padding:14px;">
-<p style="font-size:13px;font-weight:700;">Dairy Quality Monitoring Dashboard — Updated: <span id="updTime"></span> EAT • Live Supabase</p>
-<p style="font-size:11px;color:#66756b;">Latest batches submitted today • Kirinyaga County</p>
-
-<div class="categories" id="catBtns" style="margin-top:12px;">
-<button class="category-btn active" data-cat="All">All Milk</button>
-<button class="category-btn" data-cat="Accepted">Accepted</button>
-<button class="category-btn" data-cat="Grade A">Grade A</button>
-<button class="category-btn" data-cat="Grade B">Grade B</button>
-<button class="category-btn" data-cat="Rejected">Rejected</button>
+<div style="background:#064c32;color:#fff;text-align:center;padding:8px;font-size:11px">🥛 Podago Dairy Live — 23 Co-ops • M-Pesa • Live from Supabase • No A+ Grade</div>
+<header><div class="container" style="min-height:70px;display:flex;align-items:center;justify-content:space-between"><a class="brand">🥛 Podago Dairy Cooperative</a><div style="font-size:12px;font-weight:700"><a href="admin.html" style="border:1px solid #ddd;border-radius:999px;padding:6px 10px;text-decoration:none">View Admin</a> QC Officer | Logout</div></div></header>
+<div class="container" style="padding:20px 0">
+<div class="card" style="padding:14px"><p style="font-size:13px;font-weight:700">Dairy Quality Monitoring — Updated: <span id="updTime"></span> • Live Supabase</p>
+<div style="margin-top:12px;display:flex;gap:8px;overflow:auto" id="catBtns"><button class="category-btn active" data-cat="All">All Milk</button><button class="category-btn" data-cat="Accepted">Accepted</button><button class="category-btn" data-cat="Grade A">Grade A</button><button class="category-btn" data-cat="Grade B">Grade B</button><button class="category-btn" data-cat="Rejected">Rejected</button></div>
+<div style="display:grid;grid-template-columns:1.6fr .8fr;gap:16px;margin-top:16px"><div class="card"><div style="overflow:auto"><table style="width:100%;min-width:620px;border-collapse:collapse;font-size:13px"><thead><tr style="background:#e9ecea"><th style="padding:10px;text-align:left">Batch ID</th><th>Farmer Name</th><th>Volume (L)</th><th>Fat %</th><th>Quality</th><th>Remarks</th></tr></thead><tbody id="milkBody"><tr><td colspan="6" style="padding:20px;text-align:center">Loading live from Supabase...</td></tr></tbody></table></div><div style="padding:10px;background:#f0f9f0;font-size:11px">Note: Kenya Dairy Board — Accepted, Grade A, Grade B, Rejected only.</div></div><div class="card" style="padding:16px"><h3>Quality Breakdown</h3><div id="breakdown" style="margin-top:12px;font-size:13px;line-height:2"></div></div></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px"><div class="card" style="padding:14px;text-align:center"><small>Total Collections Today</small><b id="totalLit" style="display:block;font-size:22px">0 L</b><small style="color:green">Live from Supabase</small></div><div class="card" style="padding:14px;text-align:center"><small>Accepted Milk</small><b id="acceptedLit" style="display:block;font-size:22px">0 L</b><small id="accPer">0%</small></div><div class="card" style="padding:14px;text-align:center"><small>Grade B Milk</small><b id="gradeBLit" style="display:block;font-size:22px">0 L</b><small id="bPer">0%</small></div><div class="card" style="padding:14px;text-align:center"><small>Rejected Milk</small><b id="rejectedLit" style="display:block;font-size:22px">0 L</b><small id="rejPer">0%</small></div></div>
 </div>
-
-<div class="live-grid" style="margin-top:16px;">
-<div class="card">
-<div class="table-wrap">
-<table><thead><tr><th>Batch ID</th><th>Farmer Name</th><th>Volume (L)</th><th>Fat %</th><th>Quality</th><th>Remarks</th></tr></thead>
-<tbody id="milkBody"><tr><td colspan="6" style="padding:20px;text-align:center;">Loading 827L live...</td></tr></tbody></table>
+<div class="card" style="max-width:760px;margin:24px auto;padding:16px"><h3>🥛 Record Delivery</h3><form id="milkForm" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><input id="fName" required placeholder="Farmer Name" style="border:1px solid #ddd;border-radius:8px;padding:10px"><select id="fQuality" required style="border:1px solid #ddd;border-radius:8px;padding:10px"><option value="">Quality (No A+)</option><option>Accepted</option><option>Grade A</option><option>Grade B</option><option>Rejected</option></select><input id="fLit" type="number" required placeholder="Volume L" style="border:1px solid #ddd;border-radius:8px;padding:10px"><input id="fFat" placeholder="Fat % e.g 3.8" style="border:1px solid #ddd;border-radius:8px;padding:10px"><button style="grid-column:1/-1;background:#087747;color:#fff;padding:12px;border-radius:10px;font-weight:700;border:none">Save Delivery</button></form><p id="msg" style="font-size:12px;color:green;margin-top:6px"></p></div>
 </div>
-<div style="padding:10px;background:#f0f9f0;font-size:11px;">Note: Quality grading follows Kenya Dairy Board standards — Accepted, Grade A, Grade B, Rejected. No A+ grade applied.</div>
-</div>
-
-<div class="card" style="padding:16px;">
-<h3 style="font-size:18px;">Quality Breakdown</h3>
-<div id="breakdown" style="margin-top:12px;font-size:13px;line-height:2;"></div>
-<div style="background:#eef7fb;border:1px solid #b6d8e8;border-radius:12px;padding:12px;margin-top:16px;font-size:11px;">
-<b>ⓘ Daily QC Summary</b><br>
-• All rejected milk has been isolated per protocol<br>
-• Average milk temperature: 4.2°C (within range)<br>
-• Collection point: Kirinyaga Cooling Plant
-</div>
-</div>
-</div>
-
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;" class="stats">
-<div class="stat"><small>Total Collections Today</small><b id="totalLit">827 L</b><small style="color:green;" id="totalSub">Live from Supabase</small></div>
-<div class="stat"><small>Accepted Milk</small><b id="acceptedLit">230 L</b><small id="accPer">49.5% of total</small></div>
-<div class="stat"><small>Grade B Milk</small><b id="gradeBLit">80 L</b><small style="color:#a16207;" id="bPer">17.2% of total</small></div>
-<div class="stat"><small>Rejected Milk</small><b id="rejectedLit">60 L</b><small style="color:red;" id="rejPer">12.9% of total</small></div>
-</div>
-
-<h3 style="margin-top:24px;">Cooperative Network — Kirinyaga</h3>
-<div id="coopGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px;font-size:12px;"></div>
-
-<div class="card" style="max-width:760px;margin:24px auto;padding:16px;">
-<h3>🥛 Record Delivery</h3>
-<form id="milkForm" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
-<input id="fName" required placeholder="Farmer Name" style="border:1px solid var(--border);border-radius:8px;padding:10px;">
-<select id="fQuality" required style="border:1px solid var(--border);border-radius:8px;padding:10px;"><option value="">Quality (No A+)</option><option>Accepted</option><option>Grade A</option><option>Grade B</option><option>Rejected</option></select>
-<input id="fLit" type="number" required placeholder="Volume L" style="border:1px solid var(--border);border-radius:8px;padding:10px;">
-<input id="fFat" placeholder="Fat %" style="border:1px solid var(--border);border-radius:8px;padding:10px;">
-<button class="btn btn-primary" style="grid-column:1/-1;">Save Delivery</button>
-</form>
-<p id="msg" style="font-size:12px;color:green;margin-top:6px;"></p>
-</div>
-
-</div>
-</div>
-
-<footer style="background:#064c32;color:#d7e6db;text-align:center;padding:14px;font-size:10px;">Podago Dairy Cooperative | Kirinyaga, Kenya | Licensed by Kenya Dairy Board | No A+ grade applied</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-// FIXED TO USE VERCEL ENV - no hardcoded key in repo
-let supa;
-document.getElementById("updTime").innerText=new Date().toLocaleString('en-KE',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
-
-let allData=[
-  {id:"BD-10241", farmer:"James Mwangi", vol:120, fat:"3.9", quality:"Accepted", remark:"Meets standard — cleared"},
-  {id:"BD-10240", farmer:"Grace Wanjiku", vol:95, fat:"3.7", quality:"Grade A", remark:"Good quality — approved"},
-  {id:"BD-10239", farmer:"Peter Kariuki", vol:80, fat:"3.4", quality:"Grade B", remark:"Below fat target — monitor"},
-  {id:"BD-10238", farmer:"Mary Njeri", vol:60, fat:"2.8", quality:"Rejected", remark:"High bacteria — rejected"},
-  {id:"BD-10237", farmer:"David Kamau", vol:110, fat:"3.6", quality:"Accepted", remark:"Meets standard — cleared"},
-]
-
-function badge(q){
-  if(q==="Accepted") return `<span class="badge badge-accepted">Accepted</span>`
-  if(q==="Grade A") return `<span class="badge badge-a">Grade A</span>`
-  if(q==="Grade B") return `<span class="badge badge-b">Grade B</span>`
-  if(q==="Rejected") return `<span class="badge badge-rejected">Rejected</span>`
-  return q
-}
-
-function render(filter="All"){
-  const filtered=filter==="All"?allData:allData.filter(d=>d.quality===filter)
-  document.getElementById("milkBody").innerHTML=filtered.map(d=>`<tr><td>${d.id}</td><td>${d.farmer}</td><td>${d.vol}</td><td>${d.fat}</td><td>${badge(d.quality)}</td><td style="font-size:11px;">${d.remark}</td></tr>`).join("")
-  let acc=0,b=0,rej=0,a=0,total=0
-  allData.forEach(d=>{total+=Number(d.vol); if(d.quality==="Accepted") acc+=Number(d.vol); if(d.quality==="Grade A") a+=Number(d.vol); if(d.quality==="Grade B") b+=Number(d.vol); if(d.quality==="Rejected") rej+=Number(d.vol)})
-  document.getElementById("totalLit").innerText=total+" L"
-  document.getElementById("acceptedLit").innerText=acc+" L"
-  document.getElementById("gradeBLit").innerText=b+" L"
-  document.getElementById("rejectedLit").innerText=rej+" L"
-  document.getElementById("breakdown").innerHTML=`
-    <div>Accepted <div style="display:inline-block;width:80px;height:10px;background:#15803d"></div> ${acc}L (${total?Math.round(acc/total*100):0}%)</div>
-    <div>Grade A <div style="display:inline-block;width:80px;height:10px;background:#0e7490"></div> ${a}L (${total?Math.round(a/total*100):0}%)</div>
-    <div>Grade B <div style="display:inline-block;width:80px;height:10px;background:#ca8a04"></div> ${b}L (${total?Math.round(b/total*100):0}%)</div>
-    <div>Rejected <div style="display:inline-block;width:80px;height:10px;background:#dc2626"></div> ${rej}L (${total?Math.round(rej/total*100):0}%)</div>`
-}
-
-async function loadFromSupabase(){
-  const { data, error } = await supa.from('deliveries').select('*').order('created_at',{ascending:false}).limit(100)
-  if(error){ console.log('Supabase not yet created tables:', error.message); render(); loadCoops(); return; }
-  if(data && data.length>0){
-    allData = data.map(r=>({
-      id: r.batch_id || r.id.slice(0,8),
-      farmer: r.farmer_name,
-      vol: Number(r.volume),
-      fat: r.fat_percent || '3.5',
-      quality: r.quality,
-      remark: r.quality==="Rejected"?"High bacteria — rejected":r.quality==="Grade B"?"Below target — monitor":"Meets standard — cleared"
-    }))
-  }
-  render(document.querySelector(".category-btn.active")?.dataset.cat || "All")
-  loadCoops()
-}
-
-async function loadCoops(){
-  const { data } = await supa.from('cooperatives').select('*')
-  if(data && data.length>0){
-    document.getElementById("coopGrid").innerHTML=data.map(c=>`<div class="card" style="padding:10px;">${c.name} — ${c.farmers} Farmers</div>`).join('')
-  } else {
-    document.getElementById("coopGrid").innerHTML=`<div class="card" style="padding:10px;">Kagio Dairy — 312 Farmers</div><div class="card" style="padding:10px;">Kerugoya Coop — 289 Farmers</div><div class="card" style="padding:10px;">Kutus Farmers — 245 Farmers</div><div class="card" style="padding:10px;">Mutira Dairy — 154 Farmers</div>`
-  }
-}
-
-document.getElementById("catBtns").addEventListener("click",e=>{const b=e.target.closest("[data-cat]"); if(!b) return; document.querySelectorAll(".category-btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); render(b.dataset.cat)})
-
-document.getElementById("milkForm").addEventListener("submit",async e=>{
-  e.preventDefault()
-  const farmer=document.getElementById("fName").value.trim()
-  const quality=document.getElementById("fQuality").value
-  const vol=Number(document.getElementById("fLit").value)
-  const fat=document.getElementById("fFat").value||"3.5"
-  const batch="BD-"+Date.now().toString().slice(-5)
-  document.getElementById("msg").innerText="Saving to Supabase..."
-  const { error } = await supa.from('deliveries').insert([{ batch_id:batch, farmer_name:farmer, volume:vol, fat_percent:fat, quality:quality }])
-  if(error){ document.getElementById("msg").innerText="Error: "+error.message; return; }
-  allData.unshift({id:batch, farmer, vol, fat, quality, remark: quality==="Rejected"?"High bacteria — rejected":quality==="Grade B"?"Below target — monitor":"Meets standard — cleared"})
-  render(document.querySelector(".category-btn.active").dataset.cat)
-  document.getElementById("msg").innerText=`Saved ${vol}L ${farmer} — ${quality} to Supabase (Live 827L updated)`
-  e.target.reset()
-})
-
-async function initSupabase(){
-  try{
-    const res = await fetch('/api/config');
-    const cfg = await res.json();
-    if(!cfg.url || !cfg.anonKey) throw new Error('no env');
-    supa = supabase.createClient(cfg.url, cfg.anonKey);
-  }catch(err){
-    // fallback to same project if env not ready
-    supa = supabase.createClient("https://afohekpkylingutenuryc.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as");
-  }
-  loadFromSupabase();
-}
-initSupabase();
+let supa; document.getElementById("updTime").innerText=new Date().toLocaleString('en-KE',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+let allData=[];
+function badge(q){ q=(q||'').toLowerCase(); if(q.includes('accept')) return `<span class="badge badge-accepted">Accepted</span>`; if(q.includes('grade a')) return `<span class="badge badge-a">Grade A</span>`; if(q.includes('grade b')) return `<span class="badge badge-b">Grade B</span>`; return `<span class="badge badge-rejected">Rejected</span>`; }
+function render(filter="All"){ const filtered=filter==="All"?allData:allData.filter(d=>d.quality===filter); document.getElementById("milkBody").innerHTML=filtered.length?filtered.map(d=>`<tr><td style="padding:10px">${d.id}</td><td>${d.farmer}</td><td>${d.vol}L</td><td>${d.fat}%</td><td>${badge(d.quality)}</td><td style="font-size:11px">${d.remark}</td></tr>`).join(''):`<tr><td colspan=6 style="padding:20px;text-align:center">No deliveries yet — save one below</td></tr>`; let acc=0,b=0,rej=0,a=0,total=0; allData.forEach(d=>{total+=Number(d.vol); const q=(d.quality||'').toLowerCase(); if(q.includes('accept')) acc+=Number(d.vol); else if(q.includes('grade a')) a+=Number(d.vol); else if(q.includes('grade b')) b+=Number(d.vol); else rej+=Number(d.vol);}); document.getElementById("totalLit").innerText=total+" L"; document.getElementById("acceptedLit").innerText=acc+" L"; document.getElementById("gradeBLit").innerText=b+" L"; document.getElementById("rejectedLit").innerText=rej+" L"; document.getElementById("breakdown").innerHTML=`Accepted ${acc}L (${total?Math.round(acc/total*100):0}%)<br>Grade A ${a}L (${total?Math.round(a/total*100):0}%)<br>Grade B ${b}L (${total?Math.round(b/total*100):0}%)<br>Rejected ${rej}L (${total?Math.round(rej/total*100):0}%)`; }
+async function loadFromSupabase(){ try{ const {data,error}=await supa.from('deliveries').select('*').order('created_at',{ascending:false}).limit(200); if(error) throw error; if(data && data.length>0){ allData=data.map(r=>({ id:r.batch_id||r.id.slice(0,8), farmer:r.farmer_name||r.farmer||'Unknown', vol:Number(r.volume??r.litres??0), fat:r.fat_percent??r.fat??'3.5', quality:r.quality||'Accepted', remark:r.quality?.toLowerCase().includes('reject')?'High bacteria — rejected':r.quality?.toLowerCase().includes('grade b')?'Below target — monitor':'Meets standard — cleared' })); } else { allData=[]; } render(document.querySelector(".category-btn.active")?.dataset.cat||"All"); }catch(e){ document.getElementById("milkBody").innerHTML=`<tr><td colspan=6 style="padding:12px;color:red">Error: ${e.message}</td></tr>`; } }
+document.getElementById("catBtns").addEventListener("click",e=>{const b=e.target.closest("[data-cat]"); if(!b) return; document.querySelectorAll(".category-btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); render(b.dataset.cat)});
+document.getElementById("milkForm").addEventListener("submit",async e=>{ e.preventDefault(); const farmer=document.getElementById("fName").value.trim(); const quality=document.getElementById("fQuality").value; const vol=Number(document.getElementById("fLit").value); const fat=document.getElementById("fFat").value||"3.5"; const batch="BD-"+Date.now().toString().slice(-5); document.getElementById("msg").innerText="Saving to Supabase..."; const {error}=await supa.from('deliveries').insert([{ batch_id:batch, farmer_name:farmer, volume:vol, fat_percent:Number(fat), fat:Number(fat), quality:quality }]); if(error){ document.getElementById("msg").innerText="Error: "+error.message; return; } allData.unshift({id:batch,farmer,vol,fat,quality,remark:quality.toLowerCase().includes('reject')?'High bacteria — rejected':'Meets standard — cleared'}); render(document.querySelector(".category-btn.active").dataset.cat); document.getElementById("msg").innerText=`Saved ${vol}L ${farmer} — ${quality} (Live — now visible on admin)`; e.target.reset(); });
+async function init(){ let cfg; try{ let res=await fetch('/api/config'); cfg=await res.json(); if(!cfg.url) throw 0; }catch{ cfg={url:"https://afohekpkylingutenuryc.supabase.co",anonKey:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as"}; } supa=supabase.createClient(cfg.url,cfg.anonKey); loadFromSupabase(); } init();
 </script>
 </body>
 </html>
