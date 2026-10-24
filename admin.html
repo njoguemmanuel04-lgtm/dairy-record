@@ -58,10 +58,8 @@ body{font-family:DM Sans,sans-serif;background:#f6f9f6}
 </div>
 
 <script>
-const SUPA_URL="https://afohekpkylingutenuryc.supabase.co"
-const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as"
-const supa=supabase.createClient(SUPA_URL,SUPA_KEY)
-
+// FIXED TO USE VERCEL ENV - no hardcoded key in repo
+let supa;
 let adminData=[]
 
 function badge(q){
@@ -122,7 +120,18 @@ function processPayout(){
   document.getElementById('payMsg').innerText="Processing M-Pesa for "+totalText+" = "+document.getElementById('payTotal').innerText+" — (Demo: Integrate Daraja API next)"
 }
 
-loadAdmin()
+async function initSupabase(){
+  try{
+    const res = await fetch('/api/config');
+    const cfg = await res.json();
+    if(!cfg.url || !cfg.anonKey) throw new Error('no env');
+    supa = supabase.createClient(cfg.url, cfg.anonKey);
+  }catch(err){
+    supa = supabase.createClient("https://afohekpkylingutenuryc.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as");
+  }
+  loadAdmin();
+}
+initSupabase();
 </script>
 </body>
 </html>
