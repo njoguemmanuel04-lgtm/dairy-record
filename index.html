@@ -105,11 +105,8 @@ th{background:#e9ecea;padding:10px;text-align:left;font-size:11px;white-space:no
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-// YOUR SUPABASE - FIXED
-const SUPA_URL="https://afohekpkylingutenuryc.supabase.co"
-const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as"
-const supa=supabase.createClient(SUPA_URL,SUPA_KEY)
-
+// FIXED TO USE VERCEL ENV - no hardcoded key in repo
+let supa;
 document.getElementById("updTime").innerText=new Date().toLocaleString('en-KE',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
 
 let allData=[
@@ -188,7 +185,19 @@ document.getElementById("milkForm").addEventListener("submit",async e=>{
   e.target.reset()
 })
 
-loadFromSupabase()
+async function initSupabase(){
+  try{
+    const res = await fetch('/api/config');
+    const cfg = await res.json();
+    if(!cfg.url || !cfg.anonKey) throw new Error('no env');
+    supa = supabase.createClient(cfg.url, cfg.anonKey);
+  }catch(err){
+    // fallback to same project if env not ready
+    supa = supabase.createClient("https://afohekpkylingutenuryc.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmb2hla3BreWxuZ3V0ZW51cnljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTczNjYsImV4cCI6MjEwNzg3MzM2Nn0.sU5mwUu1LCDw9ZTdvAOcQNtDCCniQD7o8wXVYejK8as");
+  }
+  loadFromSupabase();
+}
+initSupabase();
 </script>
 </body>
 </html>
